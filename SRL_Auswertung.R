@@ -55,3 +55,10 @@ AD$plant2 <- (AD$T206_01 + AD$T206_02 + AD$T206_03)/3
 AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD$T207_06 + AD$T207_07)/7
 
 AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
+
+#ezANOVA
+
+library(reshape2)
+library(Hmisc)
+
+aggdata_goal <- melt(aggdata,id.vars=c("SERIAL", "GROUP"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME_neu", value.name="goal")
