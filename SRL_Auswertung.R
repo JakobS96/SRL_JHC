@@ -21,5 +21,4 @@ class(AD$TIME)
 AD$TIME_neu <- as.factor(AD$TIME)
 
 class(AD$TIME_neu)
-123
 
