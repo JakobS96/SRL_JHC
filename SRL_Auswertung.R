@@ -1,38 +1,30 @@
 
 # Laden der Pakete
+library("dplyr")
+library("psych")
 
+# Laden des Datensatzes und der Datei mit den Zusatzvariablen
+Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
 
-# Laden des Datensatzes
-Alle_Daten <- read.csv2(file.choose())
-
-Bedingung <- read.csv2(file.choose())
-
-Bedingung <- Seriennummer_und_Bedingung
-
+Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen
 
 # Kodierung fehlender Werte
 
 Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
-library("dplyr")
+# neue ZUsatzvariablen: 
+    # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
+    # 2) FinishT2 (T2 Fragebogen ausgefüllt = 1; R2 Fragebogen nicht ausgefüllt = 0)
+    # 3) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
 
-
-# neue Variable: GROUP (Feedback = 1; Achtsamkeit = 0)
-
-Alle_Daten_neu <- left_join(Alle_Daten, Bedingung, by = "SERIAL")
+Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
 
 AD <- Alle_Daten_neu
-
-# neue Variable: T2 abgeschlossen
-
-
-# neue Variable: Mehr als 17 ausgefüllte Lernplaner
-
 
 # neue Variable: Anzahl Lernplaner
 
 
-# Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? 
+# Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? --> TE16 
 
 
 # Änderung von TIME character zu factor (TIME_neu)
