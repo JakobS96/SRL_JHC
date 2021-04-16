@@ -89,8 +89,17 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 # Dropout Analysen durchführen (mit den neu gebildeten Variablen, z. B. T2 abgeschlossen)
 
 
+# Subsets bilden (T1)
+
+D_T1 <- subset(AD, TIME_neu=="T1")
+
+# Subsets bilden (T2)
+
+D_T2 <- subset(AD, TIME_neu=="T2")
+
 # Subsets bilden (T1 & T2)
 
+D_T1T2 <- rbind(D_T1, D_T2)
 
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
