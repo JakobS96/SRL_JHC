@@ -1,8 +1,14 @@
+
+# Laden der Pakete
+
+
+# Laden des Datensatzes
 Alle_Daten <- read.csv2(file.choose())
 
 Bedingung <- read.csv2(file.choose())
 
 Bedingung <- Seriennummer_und_Bedingung
+
 
 # Kodierung fehlender Werte
 
@@ -10,11 +16,24 @@ Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
 library("dplyr")
 
+
 # neue Variable: GROUP (Feedback = 1; Achtsamkeit = 0)
 
 Alle_Daten_neu <- left_join(Alle_Daten, Bedingung, by = "SERIAL")
 
 AD <- Alle_Daten_neu
+
+# neue Variable: T2 abgeschlossen
+
+
+# neue Variable: Mehr als 17 ausgefüllte Lernplaner
+
+
+# neue Variable: Anzahl Lernplaner
+
+
+# Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? 
+
 
 # Änderung von TIME character zu factor (TIME_neu)
 
@@ -23,6 +42,13 @@ class(AD$TIME)
 AD$TIME_neu <- as.factor(AD$TIME)
 
 class(AD$TIME_neu)
+
+
+# Reliabilitätsanalyse T1
+
+
+# Reliabilitätsanalyse T2
+
 
 # Skalenbildung T1
 
@@ -40,7 +66,7 @@ AD$prot1 <- (AD$T107_01 + AD$T107_02 + AD$T107_03 + AD$T107_04 + AD$T107_05 + AD
 
 AD$set1 <- (AD$T108_01 + AD$T108_02 + AD$T108_03 + AD$T108_04 + AD$T108_05 + AD$T108_06 + AD$T108_07+ AD$T108_08 + AD$T108_09)/9
 
-#Skalenbildung T2
+# Skalenbildung T2
 
 AD$goalt2 <- (AD$T202_01 + AD$T202_02 + AD$T202_03 + AD$T202_04)/4
 
@@ -56,9 +82,23 @@ AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD
 
 AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
 
-#ezANOVA
 
-library(reshape2)
-library(Hmisc)
+# Deskriptive Analysen 
 
-aggdata_goal <- melt(aggdata,id.vars=c("SERIAL", "GROUP"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME_neu", value.name="goal")
+
+# Dropout Analysen durchführen (mit den neu gebildeten Variablen, z. B. T2 abgeschlossen)
+
+
+# Subsets bilden (T1 & T2)
+
+
+# Subsets bilden (T1 & LP_T1-LP_T35)
+
+
+# Korrelation zwischen Anzahl Lernplaner und Subset T1?
+
+
+# ezANOVA oder linear mixed modell 
+
+
+
