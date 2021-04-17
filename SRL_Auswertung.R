@@ -5,6 +5,8 @@ library("psych")
 library(lme4)
 library(nlme)
 library(EMAtools)
+library(reshape)
+library(reshape2)
 
 # Laden des Datensatzes und der Datei mit den Zusatzvariablen
 Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
@@ -109,12 +111,12 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
 describeBy(AD$goalt1, group=AD$Feedback)
 describeBy(AD$goalt2, group=AD$Feedback)
 
-goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL)
-
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
 aggdata_long_GOAL <- aggdata_long_GOAL[-(104), ]
 aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
+
+goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL)
 
 anova(goal)
 
