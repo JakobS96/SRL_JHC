@@ -96,6 +96,8 @@ D_T1T2 <- rbind(D_T1, D_T2)
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
 
+D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
+
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
 
