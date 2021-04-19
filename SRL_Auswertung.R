@@ -173,3 +173,28 @@ anova(baseline_mot, mot)
 lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
 
 summary(mot)
+
+# lme für Selbstwirksamkeit
+
+describeBy(AD$set1, group=AD$Feedback)
+describeBy(AD$set2, group=AD$Feedback)
+
+aggdata_long_SE <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("set1", "set2"), variable.name="TIME",value.name="SE", na.rm = TRUE)
+
+aggdata_long_SE <- aggdata_long_SE[-(85), ]
+aggdata_long_SE <- aggdata_long_SE[-(102), ]
+aggdata_long_SE <- aggdata_long_SE[-(24), ]
+
+
+baseline_se <- lme(SE ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_SE, method = "ML")
+se <- lme(SE~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_SE, method = "ML")
+
+anova(baseline_se)
+anova(se)
+anova(baseline_se, se)
+
+lme.dscore(se,data=aggdata_long_SE,type="nlme")
+
+summary(se)
+
+
