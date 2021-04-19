@@ -112,14 +112,13 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
 describeBy(AD$goalt1, group=AD$Feedback)
 describeBy(AD$goalt2, group=AD$Feedback)
 
-# Seriennummer: ZM874366 müsste vermutlich raus, weil von dieser Person nur der T2 Fragebogen existiert und T1 fehlt 
-#Fällt auf, wenn du dir die Stichprobengrößen der Feedbackgruppe anschaust (89 vs. 90)
-
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
 aggdata_long_GOAL <- aggdata_long_GOAL[-(104), ]
 aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
+aggdata_long_GOAL <- aggdata_long_GOAL[-(330), ] # Entfernen von ZM874366, da nur T2 ausgefüllt
+
 
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL)
 
