@@ -152,3 +152,24 @@ anova(baseline_plan, plan)
 lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
 
 summary(plan)
+
+# lme für Selbst-Motivation
+
+describeBy(AD$mott1, group=AD$Feedback)
+describeBy(AD$mott2, group=AD$Feedback)
+
+aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
+
+aggdata_long_MOT <- aggdata_long_MOT[-(104), ]
+aggdata_long_MOT <- aggdata_long_MOT[-(24), ]
+
+baseline_mot <- lme(MOT ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_MOT, method = "ML")
+mot <- lme(MOT~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_MOT, method = "ML")
+
+anova(baseline_mot)
+anova(mot)
+anova(baseline_mot, mot)
+
+lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
+
+summary(mot)
