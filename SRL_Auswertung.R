@@ -106,7 +106,9 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
+
 ######## T1-T2 ANOVAs #######
+
 
 # lme für Zielsetzung
 
@@ -132,6 +134,7 @@ lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 
 summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
+
 # lme für Zielsetzung
 
 describeBy(AD$plant1, group=AD$Feedback)
@@ -153,6 +156,7 @@ lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
 
 summary(plan)
 
+
 # lme für Selbst-Motivation
 
 describeBy(AD$mott1, group=AD$Feedback)
@@ -173,6 +177,7 @@ anova(baseline_mot, mot)
 lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
 
 summary(mot)
+
 
 # lme für Selbstwirksamkeit
 
@@ -198,3 +203,13 @@ lme.dscore(se,data=aggdata_long_SE,type="nlme")
 summary(se)
 
 
+# lme für Prokrastination
+
+describeBy(D_T1T2$prot1, group=D_T1T2$Feedback)
+describeBy(D_T1T2$prot2, group=D_T1T2$Feedback) ## D_T1T2 anders als AD --> Fälle müssen gelöscht werden
+
+aggdata_long_PRO <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("prot1", "prot2"), variable.name="TIME",value.name="PRO", na.rm = TRUE)
+
+aggdata_long_PRO <- aggdata_long_PRO[-(86), ]
+aggdata_long_PRO <- aggdata_long_PRO[-(103), ]
+aggdata_long_PRO <- aggdata_long_PRO[-(24), ]
