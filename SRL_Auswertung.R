@@ -106,8 +106,9 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
+######## T1-T2 ANOVAs #######
 
-# ezANOVA oder linear mixed modell 
+# lme für Zielsetzung
 
 describeBy(AD$goalt1, group=AD$Feedback)
 describeBy(AD$goalt2, group=AD$Feedback)
@@ -120,9 +121,14 @@ aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
 aggdata_long_GOAL <- aggdata_long_GOAL[-(330), ] # Entfernen von ZM874366, da nur T2 ausgefüllt
 
 
-goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL)
+baseline_goal<-lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GOAL, method = "ML")
+goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
 
+anova(baseline_goal)
 anova(goal)
+anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
+
+# lme für Zielsetzung
 
