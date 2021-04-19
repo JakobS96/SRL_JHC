@@ -121,7 +121,7 @@ aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
 aggdata_long_GOAL <- aggdata_long_GOAL[-(330), ] # Entfernen von ZM874366, da nur T2 ausgefüllt
 
 
-baseline_goal<-lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GOAL, method = "ML")
+baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GOAL, method = "ML")
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
 
 anova(baseline_goal)
@@ -130,5 +130,25 @@ anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 
+summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
+
 # lme für Zielsetzung
 
+describeBy(AD$plant1, group=AD$Feedback)
+describeBy(AD$plant2, group=AD$Feedback)
+
+aggdata_long_PLAN <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("plant1", "plant2"), variable.name="TIME",value.name="PLAN", na.rm = TRUE)
+
+aggdata_long_PLAN <- aggdata_long_PLAN[-(104), ]
+aggdata_long_PLAN <- aggdata_long_PLAN[-(24), ]
+
+baseline_plan <- lme(PLAN ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PLAN, method = "ML")
+plan <- lme(PLAN~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PLAN, method = "ML")
+
+anova(baseline_plan)
+anova(plan)
+anova(baseline_plan, plan)
+
+lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
+
+summary(plan)
