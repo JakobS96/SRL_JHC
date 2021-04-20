@@ -104,7 +104,7 @@ AD_ohne_Dropout <- filter(AD, FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366
 
 # t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
 
-goalt1_differences <- t.test(AD$goalt1 ~ AD$Feedback)
+goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback)
 goalt1_differences
 
 # Subsets bilden (T1)
