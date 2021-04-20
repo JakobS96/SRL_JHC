@@ -20,7 +20,7 @@ Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
 # neue ZUsatzvariablen: 
     # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
-    # 2) FinishT2 (T2 Fragebogen ausgefüllt = 1; R2 Fragebogen nicht ausgefüllt = 0)
+    # 2) FinishT2 (T2 Fragebogen ausgefüllt = 1; T2 Fragebogen nicht ausgefüllt = 0)
     # 3) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
 
 Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
@@ -31,7 +31,7 @@ AD <- Alle_Daten_neu
 
 
 # Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? --> TE16 
-
+table(AD_ohne_Dropout$TE16) # Es sind 328 Einträge in den Lernplaner gemacht worden, bei denen angegeben wurde, dass KEINE studienrelevanten Tätigkeiten erfolgten.
 
 # Änderung von TIME character zu factor (TIME_neu)
 
@@ -86,6 +86,23 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 
 # Dropout Analysen durchführen (mit den neu gebildeten Variablen, z. B. T2 abgeschlossen)
 
+# Berechnen einer neuen Variable: dropout
+AD <- mutate(AD, dropout = ifelse(FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA", 0,1))
+
+AD$dropout[is.na(AD$dropout)] <- 1
+
+describeBy(data.frame(AD$Feedback), group = AD$dropout) # 606 Zeilen wurden als Dropout identifiziert.
+
+data.frame(AD$SERIAL, AD$dropout)
+
+aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"), # diesen Schritt aus dem Theobald Code verstehe ich nicht und er funktioniert auch nicht
+                        FUN = mean, na.rm = TRUE) 
+
+# Dropout raus filtern:
+AD_ohne_Dropout <- filter(AD, FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA") # Es werden 611 Fälle raus gefiltert (5x SERIAL = NA)
+
+
+
 
 # Subsets bilden (T1)
 
@@ -101,8 +118,8 @@ D_T1T2 <- rbind(D_T1, D_T2)
 
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
+D_T1LP <- filter(AD, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden
 
-D_T1LP <- filter(AD, TIME != "T2", TIME != "T3")
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
