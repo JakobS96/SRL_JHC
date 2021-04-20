@@ -95,14 +95,17 @@ describeBy(data.frame(AD$Feedback), group = AD$dropout) # 606 Zeilen wurden als 
 
 data.frame(AD$SERIAL, AD$dropout)
 
-aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"), # diesen Schritt aus dem Theobald Code verstehe ich nicht und er funktioniert auch nicht
-                        FUN = mean, na.rm = TRUE) 
+aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"),  FUN = mean, na.rm = TRUE) # diesen Schritt aus dem Theobald Code verstehe ich nicht und er funktioniert auch nicht
+                               
 
 # Dropout raus filtern:
 AD_ohne_Dropout <- filter(AD, FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA") # Es werden 611 Fälle raus gefiltert (5x SERIAL = NA)
 
 
+# t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
 
+goalt1_differences <- t.test(AD$goalt1 ~ AD$Feedback)
+goalt1_differences
 
 # Subsets bilden (T1)
 
