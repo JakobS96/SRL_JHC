@@ -159,17 +159,11 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3") # hier müsste man vermutlich n
 
 # lme für Zielsetzung
 
-describeBy(D_T1T2$goalt1, group=D_T1T2$Feedback)
-describeBy(D_T1T2$goalt2, group=D_T1T2$Feedback)
-
-
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
-write.csv2(aggdata_long_GOAL, file="GOALzählen.csv")
 
-aggdata_long_GOAL <- aggdata_long_GOAL[-(104), ]
-aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
-aggdata_long_GOAL <- aggdata_long_GOAL[-(330), ] # Entfernen von ZM874366, da nur T2 ausgefüllt
+aggdata_long_GOAL <- aggdata_long_GOAL %>% group_by(SERIAL) %>% filter(n()>1) # Filtern einzelner Seriennummern, die nur T1 oder nur T2 ausgefüllt haben
 
+table(aggdata_long_GOAL$TIME, aggdata_long_GOAL$Feedback) # Ersatz für die describeBy Funktion
 
 baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GOAL, method = "ML")
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
@@ -185,13 +179,11 @@ summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl
 
 # lme für Planung
 
-describeBy(AD$plant1, group=AD$Feedback)
-describeBy(AD$plant2, group=AD$Feedback)
-
 aggdata_long_PLAN <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("plant1", "plant2"), variable.name="TIME",value.name="PLAN", na.rm = TRUE)
 
-aggdata_long_PLAN <- aggdata_long_PLAN[-(104), ]
-aggdata_long_PLAN <- aggdata_long_PLAN[-(24), ]
+aggdata_long_PLAN <- aggdata_long_PLAN %>% group_by(SERIAL) %>% filter(n()>1)
+
+table(aggdata_long_PLAN$TIME, aggdata_long_PLAN$Feedback)
 
 baseline_plan <- lme(PLAN ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PLAN, method = "ML")
 plan <- lme(PLAN~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PLAN, method = "ML")
@@ -207,13 +199,11 @@ summary(plan)
 
 # lme für Selbst-Motivation
 
-describeBy(AD$mott1, group=AD$Feedback)
-describeBy(AD$mott2, group=AD$Feedback)
-
 aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
 
-aggdata_long_MOT <- aggdata_long_MOT[-(104), ]
-aggdata_long_MOT <- aggdata_long_MOT[-(24), ]
+aggdata_long_MOT <- aggdata_long_MOT %>% group_by(SERIAL) %>% filter(n()>1)
+
+table(aggdata_long_MOT$TIME, aggdata_long_MOT$Feedback)
 
 baseline_mot <- lme(MOT ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_MOT, method = "ML")
 mot <- lme(MOT~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_MOT, method = "ML")
@@ -229,15 +219,11 @@ summary(mot)
 
 # lme für Selbstwirksamkeit
 
-describeBy(AD$set1, group=AD$Feedback)
-describeBy(AD$set2, group=AD$Feedback)
-
 aggdata_long_SE <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("set1", "set2"), variable.name="TIME",value.name="SE", na.rm = TRUE)
 
-aggdata_long_SE <- aggdata_long_SE[-(85), ]
-aggdata_long_SE <- aggdata_long_SE[-(102), ]
-aggdata_long_SE <- aggdata_long_SE[-(24), ]
+aggdata_long_SE <- aggdata_long_SE %>% group_by(SERIAL) %>% filter(n()>1)
 
+table(aggdata_long_SE$TIME, aggdata_long_SE$Feedback)
 
 baseline_se <- lme(SE ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_SE, method = "ML")
 se <- lme(SE~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_SE, method = "ML")
@@ -253,11 +239,57 @@ summary(se)
 
 # lme für Prokrastination
 
-describeBy(D_T1T2$prot1, group=D_T1T2$Feedback)
-describeBy(D_T1T2$prot2, group=D_T1T2$Feedback) ## D_T1T2 anders als AD --> Fälle müssen gelöscht werden
-
 aggdata_long_PRO <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("prot1", "prot2"), variable.name="TIME",value.name="PRO", na.rm = TRUE)
 
-aggdata_long_PRO <- aggdata_long_PRO[-(86), ]
-aggdata_long_PRO <- aggdata_long_PRO[-(103), ]
-aggdata_long_PRO <- aggdata_long_PRO[-(24), ]
+aggdata_long_PRO <- aggdata_long_PRO %>% group_by(SERIAL) %>% filter(n()>1)
+
+table(aggdata_long_PRO$TIME, aggdata_long_PRO$Feedback)
+
+baseline_pro <- lme(PRO ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PRO, method = "ML")
+pro <- lme(PRO~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PRO, method = "ML")
+
+anova(baseline_pro)
+anova(pro)
+anova(baseline_pro, pro)
+
+lme.dscore(pro,data=aggdata_long_PRO,type="nlme")
+
+summary(pro)
+
+# lme für Volition
+
+aggdata_long_VOL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("volt1", "volt2"), variable.name="TIME",value.name="VOL", na.rm = TRUE)
+
+aggdata_long_VOL <- aggdata_long_VOL %>% group_by(SERIAL) %>% filter(n()>1)
+
+table(aggdata_long_VOL$TIME, aggdata_long_VOL$Feedback)
+
+baseline_vol <- lme(VOL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_VOL, method = "ML")
+vol <- lme(VOL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_VOL, method = "ML")
+
+anova(baseline_vol)
+anova(vol)
+anova(baseline_vol, vol)
+
+lme.dscore(vol,data=aggdata_long_VOL,type="nlme")
+
+summary(vol)
+
+# lme für Reflektion
+
+aggdata_long_REF <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("reft1", "reft2"), variable.name="TIME",value.name="REF", na.rm = TRUE)
+
+aggdata_long_REF <- aggdata_long_REF %>% group_by(SERIAL) %>% filter(n()>1)
+
+table(aggdata_long_REF$TIME, aggdata_long_REF$Feedback)
+
+baseline_ref <- lme(REF ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_REF, method = "ML")
+ref <- lme(REF~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_REF, method = "ML")
+
+anova(baseline_ref)
+anova(ref)
+anova(baseline_ref, ref)
+
+lme.dscore(ref,data=aggdata_long_REF,type="nlme")
+
+summary(ref)
