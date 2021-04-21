@@ -15,7 +15,7 @@ library(semTools)
 # Laden des Datensatzes und der Datei mit den Zusatzvariablen
 Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
 
-Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen
+Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
 # Kodierung fehlender Werte
 
@@ -23,11 +23,11 @@ Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
 # neue ZUsatzvariablen: 
     # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
-    # 2) FinishT2 (T2 Fragebogen ausgefüllt = 1; T2 Fragebogen nicht ausgefüllt = 0)
-    # 3) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
+    # 2) FinishT1 (T1 Fragebogen ausgefüllt = 1; T1 Fragebogen nicht ausgefüllt = 0)
+    # 3) FinishT2 (T2 Fragebogen ausgefüllt = 1; T2 Fragebogen nicht ausgefüllt = 0)
+    # 4) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
 
 Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
-
 
 AD <- Alle_Daten_neu
 
@@ -35,7 +35,7 @@ AD <- Alle_Daten_neu
 
 
 # Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? --> TE16 
-table(AD_ohne_Dropout$TE16) # Es sind 328 Einträge in den Lernplaner gemacht worden, bei denen angegeben wurde, dass KEINE studienrelevanten Tätigkeiten erfolgten.
+table(AD_ohne_Dropout$TE16) # Es sind 332 Einträge in den Lernplaner gemacht worden, bei denen angegeben wurde, dass KEINE studienrelevanten Tätigkeiten erfolgten.
 
 # Änderung von TIME character zu factor (TIME_neu)
 
@@ -46,17 +46,51 @@ AD$TIME_neu <- as.factor(AD$TIME)
 class(AD$TIME_neu)
 
 
-# Reliabilitätsanalyse T1
+# Reliabilitätsanalysen T1: Berechnung McDonalds Omega
+
 omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
-omega(omegagoalt1)
+omega(omegagoalt1) # alpha = .68; omega = .76
 
 omegamott1 <- AD_ohne_Dropout[c("T103_01", "T103_02", "T103_03")]
-omega(omegamott1)
+omega(omegamott1) # alpha = .79; omega = .82
 
 omegavolt1 <- AD_ohne_Dropout[c("T104_01", "T104_02", "T104_03","T104_04")]
-omega(omegavolt1)
+omega(omegavolt1) # alpha = .76; omega = .78
+
+omegareft1 <- AD_ohne_Dropout[c("T105_01", "T105_02", "T105_03")]
+omega(omegareft1) # alpha = .71; omega = .74
+
+omegaplant1 <- AD_ohne_Dropout[c("T106_01", "T106_02", "T106_03")]
+omega(omegaplant1) # alpha = .86; omega = .88
+
+omegaprot1 <- AD_ohne_Dropout[c("T107_01", "T107_02", "T107_03","T107_04","T107_05","T107_06","T107_07")]
+omega(omegaprot1) # alpha = .95; omega = .96
+
+omegaset1 <- AD_ohne_Dropout[c("T108_01", "T108_02", "T108_03","T108_04","T108_05","T108_06","T108_07","T108_08","T108_09")]
+omega(omegaset1) # alpha = .86; omega = .89
 
 # Reliabilitätsanalyse T2
+
+omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
+omega(omegagoalt2)
+
+omegamott2 <- AD_ohne_Dropout[c("T203_01", "T203_02", "T203_03")]
+omega(omegamott2) # alpha = .83; omega = .84
+
+omegavolt2 <- AD_ohne_Dropout[c("T204_01", "T204_02", "T204_03","T204_04")]
+omega(omegavolt2) # alpha = .85; omega = .87
+
+omegareft2 <- AD_ohne_Dropout[c("T205_01", "T205_02", "T205_03")]
+omega(omegareft2) # alpha = .77; omega = .79
+
+omegaplant2 <- AD_ohne_Dropout[c("T206_01", "T206_02", "T206_03")]
+omega(omegaplant2) # alpha = .85; omega = .85
+
+omegaprot2 <- AD_ohne_Dropout[c("T207_01", "T207_02", "T207_03","T207_04","T207_05","T207_06","T207_07")]
+omega(omegaprot2) # alpha = .92; omega = .94
+
+omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
+omega(omegaset2) # alpha = .88; omega = .91
 
 
 # Skalenbildung T1
@@ -125,13 +159,13 @@ set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback)
 set1_differences # n.s.
 
 prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback)
-prot1_differences # n. s.
+prot1_differences # n.s.
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback)
-volt1_differences # n. s.
+volt1_differences # n.s.
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback)
-reft1_differences # n. s.
+reft1_differences # n.s.
 
 
 # Subsets bilden (T1)
@@ -148,7 +182,7 @@ D_T1T2 <- rbind(D_T1, D_T2)
 
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
-D_T1LP <- filter(AD, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden
+D_T1LP <- filter(AD_ohne_Dropout, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden
 
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
@@ -161,7 +195,6 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3") # hier müsste man vermutlich n
 
 describeBy(D_T1T2$goalt1, group=D_T1T2$Feedback)
 describeBy(D_T1T2$goalt2, group=D_T1T2$Feedback)
-
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 write.csv2(aggdata_long_GOAL, file="GOALzählen.csv")
