@@ -127,11 +127,11 @@ reft1_differences # n. s.
 
 # Subsets bilden (T1)
 
-D_T1 <- subset(AD, TIME_neu=="T1")
+D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
 
 # Subsets bilden (T2)
 
-D_T2 <- subset(AD, TIME_neu=="T2")
+D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
 
 # Subsets bilden (T1 & T2)
 
