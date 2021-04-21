@@ -84,7 +84,6 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 # Deskriptive Analysen 
 
 
-# Dropout Analysen durchführen (mit den neu gebildeten Variablen, z. B. T2 abgeschlossen)
 
 # Berechnen einer neuen Variable: dropout
 AD <- mutate(AD, dropout = ifelse(FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA", 0,1))
@@ -105,7 +104,26 @@ AD_ohne_Dropout <- filter(AD, FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366
 # t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback)
-goalt1_differences
+goalt1_differences # n.s.
+
+plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback)
+plant1_differences # n.s.
+
+mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback)
+mott1_differences # n.s.
+
+set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback)
+set1_differences # n.s.
+
+prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback)
+prot1_differences # n. s.
+
+volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback)
+volt1_differences # n. s.
+
+reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback)
+reft1_differences # n. s.
+
 
 # Subsets bilden (T1)
 
@@ -155,7 +173,7 @@ lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
 
-# lme für Zielsetzung
+# lme für Planung
 
 describeBy(AD$plant1, group=AD$Feedback)
 describeBy(AD$plant2, group=AD$Feedback)
