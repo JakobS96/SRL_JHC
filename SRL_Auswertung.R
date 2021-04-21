@@ -2,12 +2,15 @@
 # Laden der Pakete
 library(dplyr)
 library(ez)
+library(GPArotation)
 library(psych)
 library(lme4)
+library(lavaan)
 library(nlme)
 library(EMAtools)
 library(reshape)
 library(reshape2)
+library(semTools)
 
 # Laden des Datensatzes und der Datei mit den Zusatzvariablen
 Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
@@ -24,6 +27,7 @@ Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
     # 3) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
 
 Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
+
 
 AD <- Alle_Daten_neu
 
@@ -43,7 +47,14 @@ class(AD$TIME_neu)
 
 
 # Reliabilitätsanalyse T1
+omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
+omega(omegagoalt1)
 
+omegamott1 <- AD_ohne_Dropout[c("T103_01", "T103_02", "T103_03")]
+omega(omegamott1)
+
+omegavolt1 <- AD_ohne_Dropout[c("T104_01", "T104_02", "T104_03","T104_04")]
+omega(omegavolt1)
 
 # Reliabilitätsanalyse T2
 
@@ -87,19 +98,17 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 # Dropout Analysen durchführen (mit den neu gebildeten Variablen, z. B. T2 abgeschlossen)
 
 # Berechnen einer neuen Variable: dropout
-AD <- mutate(AD, dropout = ifelse(FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA", 0,1))
+AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
 
 AD$dropout[is.na(AD$dropout)] <- 1
 
-describeBy(data.frame(AD$Feedback), group = AD$dropout) # 606 Zeilen wurden als Dropout identifiziert.
-
-data.frame(AD$SERIAL, AD$dropout)
+describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
 
 aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"),  FUN = mean, na.rm = TRUE) # diesen Schritt aus dem Theobald Code verstehe ich nicht und er funktioniert auch nicht
                                
 
 # Dropout raus filtern:
-AD_ohne_Dropout <- filter(AD, FinishT2 == 1 & Finish18 == 1 & SERIAL!= "ZM874366" & SERIAL != "NA") # Es werden 611 Fälle raus gefiltert (5x SERIAL = NA)
+AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
 
 # t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
