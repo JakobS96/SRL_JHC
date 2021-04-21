@@ -159,11 +159,12 @@ D_T1LP <- filter(AD, TIME != "T2", TIME != "T3") # hier müsste man vermutlich n
 
 # lme für Zielsetzung
 
-describeBy(AD$goalt1, group=AD$Feedback)
-describeBy(AD$goalt2, group=AD$Feedback)
+describeBy(D_T1T2$goalt1, group=D_T1T2$Feedback)
+describeBy(D_T1T2$goalt2, group=D_T1T2$Feedback)
 
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
+write.csv2(aggdata_long_GOAL, file="GOALzählen.csv")
 
 aggdata_long_GOAL <- aggdata_long_GOAL[-(104), ]
 aggdata_long_GOAL <- aggdata_long_GOAL[-(24), ]
