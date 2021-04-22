@@ -40,6 +40,38 @@ AD$dropout[is.na(AD$dropout)] <- 1
 
 describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
 
+# Skalenbildung T1
+
+AD$goalt1 <- (AD$T102_01 + AD$T102_02 + AD$T102_03 + AD$T102_04)/4
+
+AD$mott1 <- (AD$T103_01 + AD$T103_02 + AD$T103_03)/3    
+
+AD$volt1 <- (AD$T104_01 + AD$T104_02 + AD$T104_03 + AD$T104_04)/4
+
+AD$reft1 <- (AD$T105_01 + AD$T105_02 + AD$T105_03)/3
+
+AD$plant1 <- (AD$T106_01 + AD$T106_02 + AD$T106_03)/3
+
+AD$prot1 <- (AD$T107_01 + AD$T107_02 + AD$T107_03 + AD$T107_04 + AD$T107_05 + AD$T107_06 + AD$T107_07)/7
+
+AD$set1 <- (AD$T108_01 + AD$T108_02 + AD$T108_03 + AD$T108_04 + AD$T108_05 + AD$T108_06 + AD$T108_07+ AD$T108_08 + AD$T108_09)/9
+
+# Skalenbildung T2
+
+AD$goalt2 <- (AD$T202_01 + AD$T202_02 + AD$T202_03 + AD$T202_04)/4
+
+AD$mott2 <- (AD$T203_01 + AD$T203_02 + AD$T203_03)/3    
+
+AD$volt2 <- (AD$T204_01 + AD$T204_02 + AD$T204_03 + AD$T204_04)/4
+
+AD$reft2 <- (AD$T205_01 + AD$T205_02 + AD$T205_03)/3
+
+AD$plant2 <- (AD$T206_01 + AD$T206_02 + AD$T206_03)/3
+
+AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD$T207_06 + AD$T207_07)/7
+
+AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
+
 
 # Dropout raus filtern:
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
@@ -101,38 +133,6 @@ omega(omegaprot2) # alpha = .92; omega = .94
 omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
 omega(omegaset2) # alpha = .88; omega = .91
 
-
-# Skalenbildung T1
-
-AD$goalt1 <- (AD$T102_01 + AD$T102_02 + AD$T102_03 + AD$T102_04)/4
-
-AD$mott1 <- (AD$T103_01 + AD$T103_02 + AD$T103_03)/3    
-
-AD$volt1 <- (AD$T104_01 + AD$T104_02 + AD$T104_03 + AD$T104_04)/4
-
-AD$reft1 <- (AD$T105_01 + AD$T105_02 + AD$T105_03)/3
-
-AD$plant1 <- (AD$T106_01 + AD$T106_02 + AD$T106_03)/3
-
-AD$prot1 <- (AD$T107_01 + AD$T107_02 + AD$T107_03 + AD$T107_04 + AD$T107_05 + AD$T107_06 + AD$T107_07)/7
-
-AD$set1 <- (AD$T108_01 + AD$T108_02 + AD$T108_03 + AD$T108_04 + AD$T108_05 + AD$T108_06 + AD$T108_07+ AD$T108_08 + AD$T108_09)/9
-
-# Skalenbildung T2
-
-AD$goalt2 <- (AD$T202_01 + AD$T202_02 + AD$T202_03 + AD$T202_04)/4
-
-AD$mott2 <- (AD$T203_01 + AD$T203_02 + AD$T203_03)/3    
-
-AD$volt2 <- (AD$T204_01 + AD$T204_02 + AD$T204_03 + AD$T204_04)/4
-
-AD$reft2 <- (AD$T205_01 + AD$T205_02 + AD$T205_03)/3
-
-AD$plant2 <- (AD$T206_01 + AD$T206_02 + AD$T206_03)/3
-
-AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD$T207_06 + AD$T207_07)/7
-
-AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
 
 
 # t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0)
