@@ -72,7 +72,7 @@ omega(omegaset1) # alpha = .86; omega = .89
 # ReliabilitÃ¤tsanalyse T2
 
 omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
-omega(omegagoalt2)
+omega(omegagoalt2) # alpha = .68; omega = .75
 
 omegamott2 <- AD_ohne_Dropout[c("T203_01", "T203_02", "T203_03")]
 omega(omegamott2) # alpha = .83; omega = .84
@@ -128,7 +128,7 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 
 # Deskriptive Analysen 
 
-table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # Häufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
 
