@@ -32,19 +32,26 @@ Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
 
 AD <- Alle_Daten_neu
 
-# neue Variable: Anzahl Lernplaner
+# Berechnen einer neuen Variable: dropout
+AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
+
+AD$dropout[is.na(AD$dropout)] <- 1
+
+describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
 
 
-# Welche Variable benennt "studienrelevante Tätigkeiten absolviert"? --> TE16 
-table(AD_ohne_Dropout$TE16) # Es sind 332 Einträge in den Lernplaner gemacht worden, bei denen angegeben wurde, dass KEINE studienrelevanten Tätigkeiten erfolgten.
+# Dropout raus filtern:
+AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
-# Änderung von TIME character zu factor (TIME_neu)
 
-class(AD$TIME)
+# Deskriptive Analysen 
 
-AD$TIME_neu <- as.factor(AD$TIME)
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 
-class(AD$TIME_neu)
+describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
+
+describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
+describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
 
 
 # Reliabilitätsanalysen T1: Berechnung McDonalds Omega
@@ -127,27 +134,6 @@ AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD
 AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
 
 
-# Deskriptive Analysen 
-
-table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
-
-describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
-
-describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
-describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
-
-
-# Berechnen einer neuen Variable: dropout
-AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
-
-AD$dropout[is.na(AD$dropout)] <- 1
-
-describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
-
-# Dropout raus filtern:
-AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
-
-
 # t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0)
 
 goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
@@ -194,6 +180,7 @@ volt1_differences # n.s. P = .72
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 reft1_differences # n.s. P = .58
+
 
 # Subsets bilden (T1)
 
