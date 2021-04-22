@@ -140,9 +140,6 @@ AD$dropout[is.na(AD$dropout)] <- 1
 
 describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
 
-aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"),  FUN = mean, na.rm = TRUE) # diesen Schritt aus dem Theobald Code verstehe ich nicht und er funktioniert auch nicht
-                               
-
 # Dropout raus filtern:
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
