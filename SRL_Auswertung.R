@@ -128,7 +128,9 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 
 # Deskriptive Analysen 
 
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # Häufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 
+describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
 
 # Berechnen einer neuen Variable: dropout
 AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
