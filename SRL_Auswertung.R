@@ -1,17 +1,18 @@
 
 # Laden der Pakete
+library(car)
 library(dplyr)
+library(EMAtools)
 library(ez)
 library(GPArotation)
-library(psych)
 library(lme4)
 library(lavaan)
 library(nlme)
-library(EMAtools)
+library(psych)
 library(reshape)
 library(reshape2)
 library(semTools)
-library(car)
+
 
 # Laden des Datensatzes und der Datei mit den Zusatzvariablen
 Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
