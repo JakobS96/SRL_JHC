@@ -128,7 +128,7 @@ AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$
 
 # Deskriptive Analysen 
 
-table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # Häufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
 
@@ -149,25 +149,25 @@ AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SE
 # t.tests fÃ¼r die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback)
-goalt1_differences # n.s.
+goalt1_differences # n.s. p = .07
 
 plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback)
-plant1_differences # n.s.
+plant1_differences # n.s. p = .13
 
 mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback)
-mott1_differences # n.s.
+mott1_differences # n.s. p = .13
 
 set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback)
-set1_differences # n.s.
+set1_differences # n.s. p = 86
 
 prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback)
-prot1_differences # n.s.
+prot1_differences # n.s. p = .99
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback)
-volt1_differences # n.s.
+volt1_differences # n.s. P = .72
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback)
-reft1_differences # n.s.
+reft1_differences # n.s. P = .58
 
 
 # Subsets bilden (T1)
@@ -205,7 +205,7 @@ baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GO
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
 
 anova(baseline_goal)
-anova(goal)
+anova(goal) # Feedback signifikant (p < .001, d = .31)
 anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
@@ -225,7 +225,7 @@ baseline_plan <- lme(PLAN ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PL
 plan <- lme(PLAN~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PLAN, method = "ML")
 
 anova(baseline_plan)
-anova(plan)
+anova(plan) # TIME und FEEDBACK signifikant (TIME: p = .027, d = .20; Feedback: p = .022, d = .28)
 anova(baseline_plan, plan)
 
 lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
@@ -245,7 +245,7 @@ baseline_mot <- lme(MOT ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_MOT,
 mot <- lme(MOT~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_MOT, method = "ML")
 
 anova(baseline_mot)
-anova(mot)
+anova(mot) # TIME signifikant (p = .009, d = .51)
 anova(baseline_mot, mot)
 
 lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
@@ -265,7 +265,7 @@ baseline_se <- lme(SE ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_SE, me
 se <- lme(SE~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_SE, method = "ML")
 
 anova(baseline_se)
-anova(se)
+anova(se) # TIME signifikant (p = < .001, d = .72)
 anova(baseline_se, se)
 
 lme.dscore(se,data=aggdata_long_SE,type="nlme")
@@ -285,7 +285,7 @@ baseline_pro <- lme(PRO ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PRO,
 pro <- lme(PRO~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PRO, method = "ML")
 
 anova(baseline_pro)
-anova(pro)
+anova(pro) # TIME signifikant (p < .001, d = -.33)
 anova(baseline_pro, pro)
 
 lme.dscore(pro,data=aggdata_long_PRO,type="nlme")
@@ -304,7 +304,7 @@ baseline_vol <- lme(VOL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_VOL,
 vol <- lme(VOL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_VOL, method = "ML")
 
 anova(baseline_vol)
-anova(vol)
+anova(vol) # TIME signifikant (p < .001, d = .32)
 anova(baseline_vol, vol)
 
 lme.dscore(vol,data=aggdata_long_VOL,type="nlme")
@@ -323,7 +323,7 @@ baseline_ref <- lme(REF ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_REF,
 ref <- lme(REF~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_REF, method = "ML")
 
 anova(baseline_ref)
-anova(ref)
+anova(ref) # n. s.
 anova(baseline_ref, ref)
 
 lme.dscore(ref,data=aggdata_long_REF,type="nlme")
