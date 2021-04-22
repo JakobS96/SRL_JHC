@@ -11,6 +11,7 @@ library(EMAtools)
 library(reshape)
 library(reshape2)
 library(semTools)
+library(car)
 
 # Laden des Datensatzes und der Datei mit den Zusatzvariablen
 Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
@@ -146,29 +147,52 @@ aggdata_AD <- aggregate(AD, by = list("SERIAL", "dropout"),  FUN = mean, na.rm =
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
 
+# t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0)
+
+goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
+goalt1_drop # n.s.
+
+plant1_drop <- t.test(AD$plant1 ~ AD$dropout, var.equal = TRUE)
+plant1_drop # n.s.
+
+mott1_drop <- t.test(AD$mott1 ~ AD$dropout, var.equal = TRUE)
+mott1_drop # n. s.
+
+set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
+set1_drop # n.s.
+
+prot1_drop <- t.test(AD$prot1 ~ AD$dropout, var.equal = TRUE)
+prot1_drop # n.s.
+
+volt1_drop <- t.test(AD$volt1 ~ AD$dropout, var.equal = TRUE)
+volt1_drop # n.s.
+
+reft1_drop <- t.test(AD$reft1 ~ AD$dropout, var.equal = TRUE)
+reft1_drop # n.s. 
+
+
 # t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
 
-goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback)
+goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 goalt1_differences # n.s. p = .07
 
-plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback)
+plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 plant1_differences # n.s. p = .13
 
-mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback)
+mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 mott1_differences # n.s. p = .13
 
-set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback)
+set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 set1_differences # n.s. p = 86
 
-prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback)
+prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 prot1_differences # n.s. p = .99
 
-volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback)
+volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 volt1_differences # n.s. P = .72
 
-reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback)
+reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 reft1_differences # n.s. P = .58
-
 
 # Subsets bilden (T1)
 
