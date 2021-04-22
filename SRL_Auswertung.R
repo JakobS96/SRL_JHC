@@ -133,6 +133,10 @@ table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Ge
 
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
 
+describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
+describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
+
+
 # Berechnen einer neuen Variable: dropout
 AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
 
@@ -201,12 +205,13 @@ D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
 
 # Subsets bilden (T1 & T2)
 
-D_T1T2 <- rbind(D_T1, D_T2)
+D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
+D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
 
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
-D_T1LP <- filter(AD_ohne_Dropout, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden
-
+D_T1LP <- filter(AD_ohne_Dropout, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden (TE16: 1 = ja, 2 = nein)
+D_T1LP <- filter(D_T1LP, TE16 != 2)
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
