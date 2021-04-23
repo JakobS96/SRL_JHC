@@ -198,8 +198,10 @@ D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
 
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
-D_T1LP <- filter(AD_ohne_Dropout, TIME != "T2", TIME != "T3") # hier müsste man vermutlich noch die Einträge der Tage raus filtern, an denen keine studienrelevanten Tätigkeiten absolviert wurden (TE16: 1 = ja, 2 = nein)
-D_T1LP <- filter(D_T1LP, TE16 != 2)
+D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
+D_LP <- filter(D_T1LP, TE16 != 2)
+
+D_T1LP <- rbind(D_T1, D_LP)
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
@@ -219,7 +221,7 @@ baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GO
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
 
 anova(baseline_goal)
-anova(goal) # Feedback signifikant (p < .001, d = .31)
+anova(goal) # Feedback signifikant (p < .001, d = .30)
 anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
@@ -343,3 +345,18 @@ anova(baseline_ref, ref)
 lme.dscore(ref,data=aggdata_long_REF,type="nlme")
 
 summary(ref)
+
+
+# grand mean centering --> noch nicht erfolgreich #### --> M = 0 prüfen 
+
+D_T1LPgmc <- D_T1LP %>%
+  mutate(
+    gmc_GOALt1 =goalt1- mean(goalt1, na.rm=TRUE),
+    gmc_PLANt1 = plant1-mean(plant1, na.rm=TRUE),
+    gmc_MOTt1 = mott1-mean(mott1, na.rm=TRUE),
+    gmc_SEt1 = set1-mean(set1, na.rm=TRUE),
+    gmc_PROt1 = prot1-mean(prot1, na.rm=TRUE),
+    gmc_VOLt1 = volt1-mean(volt1, na.rm=TRUE)
+  )
+
+
