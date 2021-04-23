@@ -79,9 +79,15 @@ AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SE
 
 # Deskriptive Analysen 
 
-table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # H?ufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # Haeufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
+
+describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) # vollständig ausgefüllte Lernplaner nach Bedingung
+table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback) # Haeufigkeitsverteilung ausgefüllte Lernplaner nach Bedingung
+
+describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) # Lernplaner nur abends, aufgeteilt nach Bedingung
+table(D_T1$Anzahl_LP_abends , D_T1$Feedback) # Haeufigkeitsverteilung Lernplaner nur abends nach Bedingung
 
 describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
