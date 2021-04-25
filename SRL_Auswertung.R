@@ -72,9 +72,194 @@ AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD
 
 AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
 
+# Skalenbildung CHIME
 
-# Dropout raus filtern:
+AD$chime1 <- (AD$FA02_01 + AD$FA02_05 + AD$FA02_14 + AD$FA02_29 + AD$FA02_34)/5
+
+AD$chime2 <- (AD$FA02_09 + AD$FA02_18 + AD$FA02_21 + AD$FA02_27)/4
+
+AD$chime3 <- (AD$FA02_10 + AD$FA02_12 + AD$FA02_17 + AD$FA02_26)/4
+
+AD$chime4 <- (AD$FA02_02 + AD$FA02_07 + AD$FA02_11 + AD$FA02_32 + AD$FA02_36)/5
+
+AD$chime5 <- (AD$FA02_08 + AD$FA02_13 + AD$FA02_16 + AD$FA02_20 + AD$FA02_25 + AD$FA02_28)/6
+
+AD$chime6 <- (AD$FA02_19 + AD$FA02_22 + AD$FA02_30 + AD$FA02_33)/4
+
+AD$chime7 <- (AD$FA02_04 + AD$FA02_23 + AD$FA02_31 + AD$FA02_35)/4
+
+AD$chime8 <- (AD$FA02_03 + AD$FA02_06 + AD$FA02_15 + AD$FA02_24 + AD$FA02_37)/5
+
+
+# Subsets bilden (Dropout raus filtern)
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
+
+# Subsets bilden (T1)
+
+D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
+
+# Subsets bilden (T2)
+
+D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
+
+# Subsets bilden (T1 & T2)
+
+D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
+D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
+
+# Subsets bilden (T1 & LP_T1-LP_T35)
+
+D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
+D_LP <- filter(D_T1LP, TE16 != 2)
+
+D_T1LP <- rbind(D_T1, D_LP)
+
+
+#### Reliabilitätsanalysen T1: Berechnung McDonalds Omega ####
+
+# Zielsetzung: alpha = .68; omega = .76 
+omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
+omega(omegagoalt1) 
+
+# Selbstmotivierung: alpha = .79; omega = .82 
+omegamott1 <- AD_ohne_Dropout[c("T103_01", "T103_02", "T103_03")]
+omega(omegamott1) 
+
+# Volition: alpha = .76; omega = .78 
+omegavolt1 <- AD_ohne_Dropout[c("T104_01", "T104_02", "T104_03","T104_04")]
+omega(omegavolt1) 
+
+# Reflexion: alpha = .71; omega = .74
+omegareft1 <- AD_ohne_Dropout[c("T105_01", "T105_02", "T105_03")]
+omega(omegareft1) 
+
+# Zeitplan: alpha = .86; omega = .88
+omegaplant1 <- AD_ohne_Dropout[c("T106_01", "T106_02", "T106_03")]
+omega(omegaplant1)
+
+# Prokrastination: alpha = .95; omega = .96 
+omegaprot1 <- AD_ohne_Dropout[c("T107_01", "T107_02", "T107_03","T107_04","T107_05","T107_06","T107_07")]
+omega(omegaprot1) 
+
+# Selbstwirksamkeit: alpha = .86; omega = .89 
+omegaset1 <- AD_ohne_Dropout[c("T108_01", "T108_02", "T108_03","T108_04","T108_05","T108_06","T108_07","T108_08","T108_09")]
+omega(omegaset1)
+
+# Chime (T1_1) Gewahrsein gegenüber inneren Erfahrungen: alpha = .70; omega = .75
+omegaChimeT1_1 <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
+omega(omegaChimeT1_1)
+
+# Chime (T1_2) Gewahrsein gegenüber äußeren Erfahrungen: alpha = .77; omega = .81
+omegaChimeT1_2 <- D_T1[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
+omega(omegaChimeT1_2)
+
+# Chime (T1_3) bewusstes Handeln, Gegenwärtigkeit: alpha = .60; omega = .67
+omegaChimeT1_3 <- D_T1[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
+omega(omegaChimeT1_3)
+
+# Chime (T1_4) annehmende, nicht-urteilende, mitfühlende Haltung: alpha = .88; omega = .90
+omegaChimeT1_4 <- D_T1[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
+omega(omegaChimeT1_4)
+
+# Chime (T1_5) nicht-reaktive, dezentrierte Orientierung: alpha = .82; omega = .88
+omegaChimeT1_5 <- D_T1[c("FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28")]
+omega(omegaChimeT1_5)
+
+# Chime (T1_6) offene, nichtvermeidende Haltung: alpha = .53; omega = .56
+omegaChimeT1_6 <- D_T1[c("FA02_19", "FA02_22", "FA02_30", "FA02_33")]
+omega(omegaChimeT1_6)
+
+# Chime (T1_7) Relativierung: alpha = .51; omega = .60
+omegaChimeT1_7 <- D_T1[c("FA02_04", "FA02_23", "FA02_31", "FA02_35")]
+omega(omegaChimeT1_7)
+
+# Chime (T1_8) einsichtsvolles Verstehen: alpha = .73; omega = .80
+omegaChimeT1_8 <- D_T1[c("FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
+omega(omegaChimeT1_8)
+
+# Chime (T1_Gesamt): alpha = .89; omega = .91
+omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34", 
+                           "FA02_09", "FA02_18", "FA02_21", "FA02_27",
+                           "FA02_10", "FA02_12", "FA02_17", "FA02_26",
+                           "FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36",
+                           "FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28",
+                           "FA02_19", "FA02_22", "FA02_30", "FA02_33",
+                           "FA02_04", "FA02_23", "FA02_31", "FA02_35",
+                           "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
+omega(omegaChimeT1_Gesamt)
+
+#### Reliabilitätsanalyse T2 ####
+
+# Zielsetzung: alpha = .68; omega = .75
+omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
+omega(omegagoalt2) 
+
+# Selbstmotivierung: alpha = .83; omega = .84 
+omegamott2 <- AD_ohne_Dropout[c("T203_01", "T203_02", "T203_03")]
+omega(omegamott2)
+
+# Volition: alpha = .85; omega = .87
+omegavolt2 <- AD_ohne_Dropout[c("T204_01", "T204_02", "T204_03","T204_04")]
+omega(omegavolt2) 
+
+# Reflexion: alpha = .77; omega = .79
+omegareft2 <- AD_ohne_Dropout[c("T205_01", "T205_02", "T205_03")]
+omega(omegareft2) 
+
+# Zeitplan: alpha = .85; omega = .85
+omegaplant2 <- AD_ohne_Dropout[c("T206_01", "T206_02", "T206_03")]
+omega(omegaplant2) 
+
+# Prokrastination: alpha = .92; omega = .94 
+omegaprot2 <- AD_ohne_Dropout[c("T207_01", "T207_02", "T207_03","T207_04","T207_05","T207_06","T207_07")]
+omega(omegaprot2) 
+
+# Selbstwirksamkeit: alpha = .88; omega = .91 
+omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
+omega(omegaset2)
+
+# Chime (T2_1) Gewahrsein gegenüber inneren Erfahrungen: alpha = .75; omega = .81
+omegaChimeT2_1 <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
+omega(omegaChimeT2_1)
+
+# Chime (T2_2) Gewahrsein gegenüber äußeren Erfahrungen: alpha = .81; omega = .82
+omegaChimeT2_2 <- D_T2[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
+omega(omegaChimeT2_2)
+
+# Chime (T2_3) bewusstes Handeln, Gegenwärtigkeit: alpha = .61; omega = .65
+omegaChimeT2_3 <- D_T2[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
+omega(omegaChimeT2_3)
+
+# Chime (T2_4) annehmende, nicht-urteilende, mitfühlende Haltung: alpha = .88; omega = .90
+omegaChimeT2_4 <- D_T2[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
+omega(omegaChimeT2_4)
+
+# Chime (T2_5) nicht-reaktive, dezentrierte Orientierung: alpha = .82; omega = .86
+omegaChimeT2_5 <- D_T2[c("FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28")]
+omega(omegaChimeT2_5)
+
+# Chime (T2_6) offene, nichtvermeidende Haltung: alpha = .71; omega = .71
+omegaChimeT2_6 <- D_T2[c("FA02_19", "FA02_22", "FA02_30", "FA02_33")]
+omega(omegaChimeT2_6)
+
+# Chime (T2_7) Relativierung: alpha = .72; omega = .77
+omegaChimeT2_7 <- D_T2[c("FA02_04", "FA02_23", "FA02_31", "FA02_35")]
+omega(omegaChimeT2_7)
+
+# Chime (T2_8) einsichtsvolles Verstehen: alpha = .73; omega = .81
+omegaChimeT2_8 <- D_T2[c("FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
+omega(omegaChimeT2_8)
+
+# Chime (T2_Gesamt): alpha = .87; omega = .90
+omegaChimeT2_Gesamt <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34", 
+                              "FA02_09", "FA02_18", "FA02_21", "FA02_27",
+                              "FA02_10", "FA02_12", "FA02_17", "FA02_26",
+                              "FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36",
+                              "FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28",
+                              "FA02_19", "FA02_22", "FA02_30", "FA02_33",
+                              "FA02_04", "FA02_23", "FA02_31", "FA02_35",
+                              "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
+omega(omegaChimeT2_Gesamt)
 
 
 # Deskriptive Analysen 
@@ -91,54 +276,6 @@ table(D_T1$Anzahl_LP_abends , D_T1$Feedback) # Haeufigkeitsverteilung Lernplaner
 
 describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
-
-
-# Reliabilitätsanalysen T1: Berechnung McDonalds Omega
-
-omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
-omega(omegagoalt1) # alpha = .68; omega = .76
-
-omegamott1 <- AD_ohne_Dropout[c("T103_01", "T103_02", "T103_03")]
-omega(omegamott1) # alpha = .79; omega = .82
-
-omegavolt1 <- AD_ohne_Dropout[c("T104_01", "T104_02", "T104_03","T104_04")]
-omega(omegavolt1) # alpha = .76; omega = .78
-
-omegareft1 <- AD_ohne_Dropout[c("T105_01", "T105_02", "T105_03")]
-omega(omegareft1) # alpha = .71; omega = .74
-
-omegaplant1 <- AD_ohne_Dropout[c("T106_01", "T106_02", "T106_03")]
-omega(omegaplant1) # alpha = .86; omega = .88
-
-omegaprot1 <- AD_ohne_Dropout[c("T107_01", "T107_02", "T107_03","T107_04","T107_05","T107_06","T107_07")]
-omega(omegaprot1) # alpha = .95; omega = .96
-
-omegaset1 <- AD_ohne_Dropout[c("T108_01", "T108_02", "T108_03","T108_04","T108_05","T108_06","T108_07","T108_08","T108_09")]
-omega(omegaset1) # alpha = .86; omega = .89
-
-# Reliabilitätsanalyse T2
-
-omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
-omega(omegagoalt2) # alpha = .68; omega = .75
-
-omegamott2 <- AD_ohne_Dropout[c("T203_01", "T203_02", "T203_03")]
-omega(omegamott2) # alpha = .83; omega = .84
-
-omegavolt2 <- AD_ohne_Dropout[c("T204_01", "T204_02", "T204_03","T204_04")]
-omega(omegavolt2) # alpha = .85; omega = .87
-
-omegareft2 <- AD_ohne_Dropout[c("T205_01", "T205_02", "T205_03")]
-omega(omegareft2) # alpha = .77; omega = .79
-
-omegaplant2 <- AD_ohne_Dropout[c("T206_01", "T206_02", "T206_03")]
-omega(omegaplant2) # alpha = .85; omega = .85
-
-omegaprot2 <- AD_ohne_Dropout[c("T207_01", "T207_02", "T207_03","T207_04","T207_05","T207_06","T207_07")]
-omega(omegaprot2) # alpha = .92; omega = .94
-
-omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
-omega(omegaset2) # alpha = .88; omega = .91
-
 
 
 # t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0)
@@ -188,26 +325,6 @@ volt1_differences # n.s. P = .72
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 reft1_differences # n.s. P = .58
 
-
-# Subsets bilden (T1)
-
-D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
-
-# Subsets bilden (T2)
-
-D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
-
-# Subsets bilden (T1 & T2)
-
-D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
-D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
-
-# Subsets bilden (T1 & LP_T1-LP_T35)
-
-D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
-D_LP <- filter(D_T1LP, TE16 != 2)
-
-D_T1LP <- rbind(D_T1, D_LP)
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
