@@ -92,6 +92,8 @@ AD$chime7 <- (AD$FA02_04 + AD$FA02_23 + AD$FA02_31 + AD$FA02_35)/4
 
 AD$chime8 <- (AD$FA02_03 + AD$FA02_06 + AD$FA02_15 + AD$FA02_24 + AD$FA02_37)/5
 
+AD$chimeGesamt <- (AD$chime1 + AD$chime2 + AD$chime3 + AD$chime4 + AD$chime5 + AD$chime6 + AD$chime7 + AD$chime8)/8
+
 
 # Subsets bilden (Dropout raus filtern)
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
@@ -117,7 +119,7 @@ D_LP <- filter(D_T1LP, TE16 != 2)
 D_T1LP <- rbind(D_T1, D_LP)
 
 
-#### Reliabilitätsanalysen T1: Berechnung McDonalds Omega ####
+##### Reliabilitätsanalysen T1: Berechnung McDonalds Omega #####
 
 # Zielsetzung: alpha = .68; omega = .76 
 omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
@@ -190,7 +192,7 @@ omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
                            "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT1_Gesamt)
 
-#### Reliabilitätsanalyse T2 ####
+##### Reliabilitätsanalyse T2 #####
 
 # Zielsetzung: alpha = .68; omega = .75
 omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
@@ -264,23 +266,30 @@ omegaChimeT2_Gesamt <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
 omega(omegaChimeT2_Gesamt)
 
 
-# Deskriptive Analysen 
+##### Deskriptive Analysen ##### 
 
-table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) # Haeufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+# Haeufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) 
 
-describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Alter aufgeteilt nach Bedingung
+# Alter aufgeteilt nach Bedingung
+describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
-describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) # vollständig ausgefüllte Lernplaner nach Bedingung
-table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback) # Haeufigkeitsverteilung ausgefüllte Lernplaner nach Bedingung
+# vollständig ausgefüllte Lernplaner, aufgeteilt nach Bedingung
+describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) 
+table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback)
 
-describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) # Lernplaner nur abends, aufgeteilt nach Bedingung
-table(D_T1$Anzahl_LP_abends , D_T1$Feedback) # Haeufigkeitsverteilung Lernplaner nur abends nach Bedingung
+# Lernplaner nur abends, aufgeteilt nach Bedingung
+describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) 
+table(D_T1$Anzahl_LP_abends , D_T1$Feedback) 
 
-describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Achtsamkeit
-describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
+# Vorwissen Thema Achtsamkeit, aufgeteilt nach Bedingung
+describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
+
+# Vorwissen Thema Feedback, aufgeteilt nach Bedingung
+describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
 
-#### t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0) ####
+##### t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0) #####
 
 AD$dropout.faktor <- factor(AD$dropout) # Dropout-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
 
@@ -326,9 +335,10 @@ leveneTest(AD$set1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
 set1_drop # n.s.
 
-#### t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1 ####
 
-AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedbck-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
+##### t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1 #####
+
+AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedback-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
 
 # Zielsetzung 
 describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -407,11 +417,35 @@ set1_differences # n.s. p = .86
 ci.smd(ncp = 0.17729,
        n.1 = 74, n.2 = 77) # Cohens d = .03
 
+# CHIME Subskala 1 
+D_T1$Feedback.Faktor <- factor(D_T1$Feedback)
+
+describeBy(D_T1$chime1, D_T1$Feedback, mat = TRUE)
+
+leveneTest(D_T1$chime1, D_T1$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime1_differences <- t.test(D_T1$chime1 ~ D_T1$Feedback, var.equal = TRUE)
+chime1_differences # signifikant p = .0054
+
+ci.smd(ncp = -2.8267,
+       n.1 = 73, n.2 = 76) # Cohens d = -.46
+
+# CHIME Gesamt (über alle 8 Subskalen hinweg)
+
+describeBy(D_T1$chimeGesamt, D_T1$Feedback, mat = TRUE)
+
+leveneTest(D_T1$chimeGesamt, D_T1$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chimeGesamt_differences <- t.test(D_T1$chimeGesamt ~ D_T1$Feedback, var.equal = TRUE)
+chimeGesamt_differences # n.s. p = 0.61
+
+ci.smd(ncp = -0.51287,
+       n.1 = 73, n.2 = 76) # Cohens d = -.08
+
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
 
-######## T1-T2 ANOVAs #######
-
+##### T1-T2 ANOVAs #####
 
 # lme für Zielsetzung
 
@@ -419,7 +453,7 @@ aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c
 
 aggdata_long_GOAL <- aggdata_long_GOAL %>% group_by(SERIAL) %>% filter(n()>1) # Filtern einzelner Seriennummern, die nur T1 oder nur T2 ausgefüllt haben
 
-table(aggdata_long_GOAL$TIME, aggdata_long_GOAL$Feedback) # Ersatz für die describeBy Funktion
+describeBy(aggdata_long_GOAL$GOAL, list(aggdata_long_GOAL$TIME, aggdata_long_GOAL$Feedback), mat = TRUE) 
 
 baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GOAL, method = "ML")
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
@@ -433,33 +467,13 @@ lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
 
-# lme für Planung
-
-aggdata_long_PLAN <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("plant1", "plant2"), variable.name="TIME",value.name="PLAN", na.rm = TRUE)
-
-aggdata_long_PLAN <- aggdata_long_PLAN %>% group_by(SERIAL) %>% filter(n()>1)
-
-table(aggdata_long_PLAN$TIME, aggdata_long_PLAN$Feedback)
-
-baseline_plan <- lme(PLAN ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PLAN, method = "ML")
-plan <- lme(PLAN~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PLAN, method = "ML")
-
-anova(baseline_plan)
-anova(plan) # TIME und FEEDBACK signifikant (TIME: p = .027, d = .20; Feedback: p = .022, d = .28)
-anova(baseline_plan, plan)
-
-lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
-
-summary(plan)
-
-
-# lme für Selbst-Motivation
+# lme für Selbstmotivierung
 
 aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
 
 aggdata_long_MOT <- aggdata_long_MOT %>% group_by(SERIAL) %>% filter(n()>1)
 
-table(aggdata_long_MOT$TIME, aggdata_long_MOT$Feedback)
+describeBy(aggdata_long_MOT$MOT, list(aggdata_long_MOT$TIME, aggdata_long_MOT$Feedback), mat = TRUE) 
 
 baseline_mot <- lme(MOT ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_MOT, method = "ML")
 mot <- lme(MOT~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_MOT, method = "ML")
@@ -473,52 +487,13 @@ lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
 summary(mot)
 
 
-# lme für Selbstwirksamkeit
-
-aggdata_long_SE <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("set1", "set2"), variable.name="TIME",value.name="SE", na.rm = TRUE)
-
-aggdata_long_SE <- aggdata_long_SE %>% group_by(SERIAL) %>% filter(n()>1)
-
-table(aggdata_long_SE$TIME, aggdata_long_SE$Feedback)
-
-baseline_se <- lme(SE ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_SE, method = "ML")
-se <- lme(SE~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_SE, method = "ML")
-
-anova(baseline_se)
-anova(se) # TIME signifikant (p = < .001, d = .72)
-anova(baseline_se, se)
-
-lme.dscore(se,data=aggdata_long_SE,type="nlme")
-
-summary(se)
-
-
-# lme für Prokrastination
-
-aggdata_long_PRO <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("prot1", "prot2"), variable.name="TIME",value.name="PRO", na.rm = TRUE)
-
-aggdata_long_PRO <- aggdata_long_PRO %>% group_by(SERIAL) %>% filter(n()>1)
-
-table(aggdata_long_PRO$TIME, aggdata_long_PRO$Feedback)
-
-baseline_pro <- lme(PRO ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PRO, method = "ML")
-pro <- lme(PRO~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PRO, method = "ML")
-
-anova(baseline_pro)
-anova(pro) # TIME signifikant (p < .001, d = -.33)
-anova(baseline_pro, pro)
-
-lme.dscore(pro,data=aggdata_long_PRO,type="nlme")
-
-summary(pro)
-
 # lme für Volition
 
 aggdata_long_VOL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("volt1", "volt2"), variable.name="TIME",value.name="VOL", na.rm = TRUE)
 
 aggdata_long_VOL <- aggdata_long_VOL %>% group_by(SERIAL) %>% filter(n()>1)
 
-table(aggdata_long_VOL$TIME, aggdata_long_VOL$Feedback)
+describeBy(aggdata_long_VOL$VOL, list(aggdata_long_VOL$TIME, aggdata_long_VOL$Feedback), mat = TRUE) 
 
 baseline_vol <- lme(VOL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_VOL, method = "ML")
 vol <- lme(VOL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_VOL, method = "ML")
@@ -531,13 +506,14 @@ lme.dscore(vol,data=aggdata_long_VOL,type="nlme")
 
 summary(vol)
 
-# lme für Reflektion
+
+# lme für Reflexion
 
 aggdata_long_REF <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("reft1", "reft2"), variable.name="TIME",value.name="REF", na.rm = TRUE)
 
 aggdata_long_REF <- aggdata_long_REF %>% group_by(SERIAL) %>% filter(n()>1)
 
-table(aggdata_long_REF$TIME, aggdata_long_REF$Feedback)
+describeBy(aggdata_long_REF$REF, list(aggdata_long_REF$TIME, aggdata_long_REF$Feedback), mat = TRUE) 
 
 baseline_ref <- lme(REF ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_REF, method = "ML")
 ref <- lme(REF~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_REF, method = "ML")
@@ -551,16 +527,106 @@ lme.dscore(ref,data=aggdata_long_REF,type="nlme")
 summary(ref)
 
 
+# lme für Zeitplan
+
+aggdata_long_PLAN <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("plant1", "plant2"), variable.name="TIME",value.name="PLAN", na.rm = TRUE)
+
+aggdata_long_PLAN <- aggdata_long_PLAN %>% group_by(SERIAL) %>% filter(n()>1)
+
+describeBy(aggdata_long_PLAN$PLAN, list(aggdata_long_PLAN$TIME, aggdata_long_PLAN$Feedback), mat = TRUE) 
+
+baseline_plan <- lme(PLAN ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PLAN, method = "ML")
+plan <- lme(PLAN~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PLAN, method = "ML")
+
+anova(baseline_plan)
+anova(plan) # TIME und FEEDBACK signifikant (TIME: p = .027, d = .20; Feedback: p = .022, d = .28)
+anova(baseline_plan, plan)
+
+lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
+
+summary(plan)
+
+
+# lme für Prokrastination
+
+aggdata_long_PRO <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("prot1", "prot2"), variable.name="TIME",value.name="PRO", na.rm = TRUE)
+
+aggdata_long_PRO <- aggdata_long_PRO %>% group_by(SERIAL) %>% filter(n()>1)
+
+describeBy(aggdata_long_PRO$PRO, list(aggdata_long_PRO$TIME, aggdata_long_PRO$Feedback), mat = TRUE) 
+
+baseline_pro <- lme(PRO ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_PRO, method = "ML")
+pro <- lme(PRO~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_PRO, method = "ML")
+
+anova(baseline_pro)
+anova(pro) # TIME signifikant (p < .001, d = -.33)
+anova(baseline_pro, pro)
+
+lme.dscore(pro,data=aggdata_long_PRO,type="nlme")
+
+summary(pro)
+
+
+# lme für Selbstwirksamkeit
+
+aggdata_long_SE <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("set1", "set2"), variable.name="TIME",value.name="SE", na.rm = TRUE)
+
+aggdata_long_SE <- aggdata_long_SE %>% group_by(SERIAL) %>% filter(n()>1)
+
+describeBy(aggdata_long_SE$SE, list(aggdata_long_SE$TIME, aggdata_long_SE$Feedback), mat = TRUE) 
+
+baseline_se <- lme(SE ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_SE, method = "ML")
+se <- lme(SE~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_SE, method = "ML")
+
+anova(baseline_se)
+anova(se) # TIME signifikant (p = < .001, d = .72)
+anova(baseline_se, se)
+
+lme.dscore(se,data=aggdata_long_SE,type="nlme")
+
+summary(se)
+
+# lme für CHIME Subskala 1 - VERSUCH
+
+D_T1T2_Test <- D_T1T2
+
+D_T1T2_Test <- D_T1T2_Test %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+
+describeBy(D_T1T2_Test$chime1, list(D_T1T2_Test$TIME, D_T1T2_Test$Feedback), mat = TRUE) # Stichproben in der Achtsamkeitsbedingung noch nicht gleich groß
+
+baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_Test, method = "ML")
+CHIME1 <- lme(chime1~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_Test, method = "ML")
+
+anova(baseline_chime1)
+anova(CHIME1) 
+anova(baseline_chime1, CHIME1)
+
+lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
+
+# lme für CHIME Gesamt - VERSUCH
+
+describeBy(D_T1T2_Test$chimeGesamt, list(D_T1T2_Test$TIME, D_T1T2_Test$Feedback), mat = TRUE) # Stichproben in der Achtsamkeitsbedingung noch nicht gleich groß
+
+baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_Test, method = "ML")
+CHIMEgesamt <- lme(chimeGesamt~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_Test, method = "ML")
+
+anova(baseline_chimeGesamt)
+anova(CHIMEgesamt) 
+anova(baseline_chimeGesamt, CHIMEgesamt)
+
+lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
+
+
 # grand mean centering --> noch nicht erfolgreich #### --> M = 0 prüfen 
 
 D_T1LPgmc <- D_T1LP %>%
   mutate(
     gmc_GOALt1 =goalt1- mean(goalt1, na.rm=TRUE),
-    gmc_PLANt1 = plant1-mean(plant1, na.rm=TRUE),
     gmc_MOTt1 = mott1-mean(mott1, na.rm=TRUE),
-    gmc_SEt1 = set1-mean(set1, na.rm=TRUE),
+    gmc_VOLt1 = volt1-mean(volt1, na.rm=TRUE),
+    gmc_PLANt1 = plant1-mean(plant1, na.rm=TRUE),
     gmc_PROt1 = prot1-mean(prot1, na.rm=TRUE),
-    gmc_VOLt1 = volt1-mean(volt1, na.rm=TRUE)
-  )
+    gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
+    )
 
 
