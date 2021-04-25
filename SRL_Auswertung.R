@@ -7,7 +7,9 @@ library(ez)
 library(GPArotation)
 library(lme4)
 library(lavaan)
+library(MBESS)
 library(nlme)
+library(nortest)
 library(psych)
 library(reshape)
 library(reshape2)
@@ -278,53 +280,132 @@ describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorw
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) # Vorwissen Thema Feedback
 
 
-# t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0)
+#### t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0) ####
+
+AD$dropout.faktor <- factor(AD$dropout) # Dropout-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
+
+# Zielsetzung 
+leveneTest(AD$goalt1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
 goalt1_drop # n.s.
 
+# Selbstmotivierung
+leveneTest(AD$mott1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+
+mott1_drop <- t.test(AD$mott1 ~ AD$dropout, var.equal = TRUE)
+mott1_drop # n.s.
+
+# Volition
+leveneTest(AD$volt1, AD$dropout.faktor) # signifikant => Varianzhomogenität NICHT gegeben => Welch-Test
+
+volt1_drop <- t.test(AD$volt1 ~ AD$dropout)
+volt1_drop # n.s.
+
+# Reflexion
+leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+
+reft1_drop <- t.test(AD$reft1 ~ AD$dropout, var.equal = TRUE)
+reft1_drop # n.s.
+
+# Zeitplan
+leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+
 plant1_drop <- t.test(AD$plant1 ~ AD$dropout, var.equal = TRUE)
 plant1_drop # n.s.
 
-mott1_drop <- t.test(AD$mott1 ~ AD$dropout, var.equal = TRUE)
-mott1_drop # n. s.
-
-set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
-set1_drop # n.s.
+# Prokrastination
+leveneTest(AD$prot1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 prot1_drop <- t.test(AD$prot1 ~ AD$dropout, var.equal = TRUE)
 prot1_drop # n.s.
 
-volt1_drop <- t.test(AD$volt1 ~ AD$dropout, var.equal = TRUE)
-volt1_drop # n.s.
+# Selbstwirksamkeit
+leveneTest(AD$set1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
-reft1_drop <- t.test(AD$reft1 ~ AD$dropout, var.equal = TRUE)
-reft1_drop # n.s. 
+set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
+set1_drop # n.s.
 
+#### t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1 ####
 
-# t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1
+AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedbck-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
+
+# Zielsetzung 
+describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 goalt1_differences # n.s. p = .07
 
-plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-plant1_differences # n.s. p = .13
+ci.smd(ncp = -1.835,
+       n.1 = 74, n.2 = 77) # Cohens d = -.30 
+
+# Selbstmotivierung
+describeBy(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
 
 mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 mott1_differences # n.s. p = .13
 
-set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-set1_differences # n.s. p = 86
+ci.smd(ncp = -1.5245,
+       n.1 = 74, n.2 = 78) # Cohens d = -.25 
 
-prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-prot1_differences # n.s. p = .99
+# Volition 
+describeBy(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 volt1_differences # n.s. P = .72
 
+ci.smd(ncp = -0.36545,
+       n.1 = 74, n.2 = 78) # Cohens d = -.06
+
+# Reflexion 
+describeBy(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 reft1_differences # n.s. P = .58
 
+ci.smd(ncp = -0.56251,
+       n.1 = 74, n.2 = 78) # Cohens d = -.09
+
+# Zeitplan
+describeBy(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
+plant1_differences # n.s. p = .13
+
+ci.smd(ncp = -1.5088,
+       n.1 = 74, n.2 = 78) # Cohens d = -.24
+
+# Prokrastination
+describeBy(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
+prot1_differences # n.s. p = .99
+
+ci.smd(ncp = -0.016574,
+       n.1 = 74, n.2 = 77) # Cohens d = -.003
+
+# Selbstwirksamkeit
+describeBy(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
+set1_differences # n.s. p = .86
+
+ci.smd(ncp = 0.17729,
+       n.1 = 74, n.2 = 77) # Cohens d = .03
 
 # Korrelation zwischen Anzahl Lernplaner und Subset T1?
 
