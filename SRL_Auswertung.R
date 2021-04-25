@@ -466,6 +466,15 @@ lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 
 summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
+# erster Versuch Mittelwerte graphisch darzustellen
+plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feedback,
+              lty = c(1,3), las =1,  by.var = TRUE, eyes = FALSE, 
+              xlab = "Bedingung", 
+              ylab = "Zielsetzung", ylim = c(1,6),
+              main = "Zielsetzung Prä-Post",
+              family(serif),
+              )
+
 
 # lme für Selbstmotivierung
 
