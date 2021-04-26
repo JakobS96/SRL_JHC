@@ -114,7 +114,7 @@ D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
 # Subsets bilden (T1 & LP_T1-LP_T35)
 
 D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
-D_LP <- filter(D_T1LP, TE16 != 2)
+D_LP <- filter(D_LP, TE16 != 2)
 
 D_T1LP <- rbind(D_T1, D_LP)
 
