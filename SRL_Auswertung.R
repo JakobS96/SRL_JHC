@@ -625,6 +625,15 @@ anova(baseline_chimeGesamt, CHIMEgesamt)
 
 lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
 
+# Korrelation state und trait Variablen --> funzt noch nicht
+
+KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_02","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
+
+cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_02,TE03_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
+
+library("apaTables")
+
+cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
 
 # grand mean centering --> noch nicht erfolgreich #### --> M = 0 prüfen 
 
@@ -638,4 +647,24 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
+# der klägliche Versuch eines HLM (funzt nicht)
 
+HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
+
+intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
+
+randomIntercept <-lme(GOAL ~ 1, data = HLMdata_GOAL, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
+
+timeRI<-update(randomIntercept, .~. + TIME)
+
+summary(timeRI)
+
+timeRS<-update(timeRI, random = ~Feedback +TIME|SERIAL)
+
+ARModel<-update(timeRS, correlation = corAR1())
+
+anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
+
+summary(ARModel); intervals(ARModel)
+
+goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +TIME | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
