@@ -649,7 +649,9 @@ D_T1LPgmc <- D_T1LP %>%
 
 # der klägliche Versuch eines HLM (funzt nicht)
 
-HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
+# nach Field
+
+HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
 intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
 
@@ -661,10 +663,12 @@ summary(timeRI)
 
 timeRS<-update(timeRI, random = ~Feedback +TIME|SERIAL)
 
-ARModel<-update(timeRS, correlation = corAR1())
+ARModel<-update(timeRS, correlation = corAR1()) # kann hier keine Autokorrelation definieren
 
 anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
 
-summary(ARModel); intervals(ARModel)
+summary(ARModel); intervals(ARModel) # intervals läuft nicht
+
+# nach Theobald
 
 goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +TIME | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
