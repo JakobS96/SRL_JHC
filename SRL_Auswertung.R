@@ -5,6 +5,7 @@ library(dplyr)
 library(EMAtools)
 library(ez)
 library(GPArotation)
+library(ICC)
 library(lme4)
 library(lavaan)
 library(MBESS)
@@ -643,9 +644,9 @@ lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
 
 # Korrelation state und trait Variablen --> funzt noch nicht
 
-KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_02","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
+KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_01","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
 
-cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_02,TE03_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
+cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_01,TE03_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
 
 library("apaTables")
 
@@ -663,11 +664,30 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
+# ICC berechnen
+
+ICCgoal <- ICCbare(SERIAL, TE03_01, AD_ohne_Dropout)
+ICCgoal
+ICCse <- ICCbare(SERIAL, SE01_03, AD_ohne_Dropout)
+ICCse
+ICCmot <- ICCbare(SERIAL, SM02_01, AD_ohne_Dropout)
+ICCmot
+ICCplan <- ICCbare(SERIAL, PL01_01, AD_ohne_Dropout)
+ICCplan
+ICCef <- ICCbare(SERIAL, TE08_01, AD_ohne_Dropout)
+ICCef
+ICCtimeM <- ICCbare(SERIAL, TE06_01, AD_ohne_Dropout)
+ICCtimeM 
+ICCsat <- ICCbare(SERIAL, TE10_01, AD_ohne_Dropout)
+ICCsat
+ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
+ICCpro
+
 # der klägliche Versuch eines HLM (funzt nicht)
 
 # nach Field
 
-HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
+HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
 intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
 
@@ -685,6 +705,31 @@ anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
 
 summary(ARModel); intervals(ARModel) # intervals läuft nicht
 
+
+intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
+
+randomIntercept <-lme(GOAL ~ 1, data = HLMdata_GOAL, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
+
+timeRI<-update(randomIntercept, .~. + TIME)
+
+summary(timeRI)
+
+timeRS<-update(timeRI, random = ~Feedback +TIME|SERIAL)
+
+ARModel<-update(timeRS, correlation = corAR1()) # kann hier keine Autokorrelation definieren
+
+anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
+
+summary(ARModel); intervals(ARModel)
+
 # nach Theobald
 
-goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +TIME | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
+D_T1LPgmc$gmc_GOALt1fac <- factor(D_T1LPgmc$gmc_GOALt1) ### random Ausprobiern
+D_T1LPgmc$TIMEfac <- factor(D_T1LPgmc$TIME)
+D_T1LPgmc$SERIALfac <- factor(D_T1LPgmc$SERIAL)
+D_T1LPgmc$Feedbackfac <- factor(D_T1LPgmc$Feedback)
+D_T1LPgmc$TE03_01fac <- factor(D_T1LPgmc$TE03_01) ## Im Zweifel löschen
+
+goalsetting_feedback <-lme(TE03_01 ~ Feedbackfac+ gmc_GOALt1fac ,  correlation = corAR1(),  random = ~ 1 + Feedbackfac +TIMEfac | SERIALfac, data = D_T1LPgmc, na.action=na.omit, method='ML')
+
+selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  , random = ~ 1 + Feedback + days | idnr, data=data, na.action=na.omit, method='ML')
