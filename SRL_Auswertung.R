@@ -295,6 +295,8 @@ describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE)
 AD$dropout.faktor <- factor(AD$dropout) # Dropout-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
 
 # Zielsetzung 
+describeBy(AD$goalt1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$goalt1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
@@ -683,53 +685,74 @@ ICCsat
 ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
 ICCpro
 
-# der klägliche Versuch eines HLM (funzt nicht)
+### der klägliche Versuch eines HLM (funzt nicht)
 
 # nach Field
 
-HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
-intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
+intercept <-gls(TE03_01 ~ 1, data = D_T1LPgmc, method = "ML", na.action = na.exclude)
 
-randomIntercept <-lme(GOAL ~ 1, data = HLMdata_GOAL, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
+summary(intercept)
 
-timeRI<-update(randomIntercept, .~. + TIME)
+randomIntercept <-lme(TE03_01 ~ 1, data = D_T1LPgmc, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
+
+summary(randomIntercept)
+
+timeRI<-update(randomIntercept, .~. + DAYS)
 
 summary(timeRI)
 
-timeRS<-update(timeRI, random = ~Feedback +TIME|SERIAL)
+timeRS<-update(timeRI, random = ~Feedback +DAYS|SERIAL)
+
+summary(timeRS)
 
 ARModel<-update(timeRS, correlation = corAR1()) # kann hier keine Autokorrelation definieren
 
 anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
 
-summary(ARModel); intervals(ARModel) # intervals läuft nicht
+summary(ARModel); 
+intervals(ARModel) 
 
 
-intercept <-gls(GOAL ~ 1, data = HLMdata_GOAL, method = "ML", na.action = na.exclude)
+# Wenn man DAYS zu character transformiert und damit rechnet (DAYSchar), kommen dieselben Ergebnisse wie für TIME raus
 
-randomIntercept <-lme(GOAL ~ 1, data = HLMdata_GOAL, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
+D_T1LPgmc$DAYSchar <- as.character(D_T1LPgmc$DAYS) 
 
-timeRI<-update(randomIntercept, .~. + TIME)
 
-summary(timeRI)
+## TIME statt DAYS (test-Rechnung)
 
-timeRS<-update(timeRI, random = ~Feedback +TIME|SERIAL)
+timeRI2<-update(randomIntercept, .~. + TIME) 
 
-ARModel<-update(timeRS, correlation = corAR1()) # kann hier keine Autokorrelation definieren
+summary(timeRI2)
 
-anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
+timeRS2<-update(timeRI2, random = ~Feedback +TIME|SERIAL) # Mit TIME und dem D_T1LPgmc Datensatz funktioniert es ab hier nicht mehr
 
-summary(ARModel); intervals(ARModel)
+summary(timeRS2)
+
+
+# braucht man einen aggregierten Datensatz oder können wir einfach mit D_T1LPgmc rechnen? z. B.:
+
+HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE) 
+
+
+### Neuer Versuch mit lme4 Paket und lmer Funktion
+
+modell.1 <- lmer(TE03_01 ~ 1 + (1|Feedback), data = D_T1LPgmc)
+summary(modell.1)
+
+0.04914/(0.04914+1.60414) # ICC
+
+modell.2 <- lmer(TE03_01 ~ SERIAL+(1|Feedback), data = D_T1LPgmc)
+summary(modell.2)
 
 # nach Theobald
 
-D_T1LPgmc$gmc_GOALt1fac <- factor(D_T1LPgmc$gmc_GOALt1) ### random Ausprobiern
+D_T1LPgmc$gmc_GOALt1fac <- factor(D_T1LPgmc$gmc_GOALt1) ### random Ausprobiern, weil die Fehlermeldung sagt die factors haben nicht 2 Level (SERIAL hat z. B. nur 1 level und die anderen sind keine factors)
 D_T1LPgmc$TIMEfac <- factor(D_T1LPgmc$TIME)
 D_T1LPgmc$SERIALfac <- factor(D_T1LPgmc$SERIAL)
 D_T1LPgmc$Feedbackfac <- factor(D_T1LPgmc$Feedback)
 D_T1LPgmc$TE03_01fac <- factor(D_T1LPgmc$TE03_01) ## Im Zweifel löschen
 
-goalsetting_feedback <-lme(TE03_01 ~ Feedbackfac+ gmc_GOALt1fac ,  correlation = corAR1(),  random = ~ 1 + Feedbackfac +TIMEfac | SERIALfac, data = D_T1LPgmc, na.action=na.omit, method='ML')
+goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +DAYSchar | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
 
 selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  , random = ~ 1 + Feedback + days | idnr, data=data, na.action=na.omit, method='ML')
