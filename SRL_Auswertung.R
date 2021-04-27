@@ -4,6 +4,7 @@ library(car)
 library(dplyr)
 library(EMAtools)
 library(ez)
+library(ggplot2)
 library(GPArotation)
 library(ICC)
 library(lme4)
@@ -477,7 +478,35 @@ plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feed
               main = "Zielsetzung Prä-Post",
               family(serif),
               )
+# Versuch die Graphik schön darzustellen
 
+aggdata_GOAL_plot <- melt(D_T1T2,id.vars=c("Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
+cell1 <- subset(aggdata_GOAL_plot, Feedback == "0" & TIME == "goalt1")
+cell2 <- subset(aggdata_GOAL_plot, Feedback == "0" & TIME == "goalt2")
+cell3 <- subset(aggdata_GOAL_plot, Feedback == "1" & TIME == "goalt1")
+cell4 <- subset(aggdata_GOAL_plot, Feedback == "1" & TIME == "goalt2")
+
+a <- describeBy(cell1$GOAL)
+b <- describeBy(cell2$GOAL)
+c <- describeBy(cell3$GOAL)
+d <- describeBy(cell4$GOAL)
+
+a$mean
+b$mean
+
+plotdat <- data.frame(Feedback = c("0", "0", "1", "1"),
+                      Messzeitpunkt = c("goalt1", "goalt2", "goalt1", "goalt2"),
+                      Means = c(a$mean, b$mean, c$mean, d$mean),
+                      Serrs = c(a$se, b$se, c$se, d$se))
+                      
+motorbar <- ggplot(data=plotdat, aes(x = Feedback, y=Means, fill = Messzeitpunkt))
+
+motorbar <- motorbar + geom_bar(stat="identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin=Means-2*Serrs, ymax=Means+2*Serrs), width=.2,
+                position=position_dodge(.9)) +
+  labs(x="Feedbackgruppe", y = "Zielsetzung")+
+  scale_fill_brewer(palette="Paired") + theme_minimal()
+motorbar
 
 # lme für Selbstmotivierung
 
@@ -491,13 +520,22 @@ baseline_mot <- lme(MOT ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_MOT,
 mot <- lme(MOT~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_MOT, method = "ML")
 
 anova(baseline_mot)
-anova(mot) # TIME signifikant (p = .009, d = .51)
+anova(mot) # TIME signifikant (p = .007, d = .51)
 anova(baseline_mot, mot)
 
 lme.dscore(mot,data=aggdata_long_MOT,type="nlme")
 
 summary(mot)
 
+# plot für Selbstmotivierung
+
+plot_GOAL <- error.bars.by(data.frame(D_T1T2$mott1, D_T1T2$mott2), D_T1T2$Feedback,
+                           lty = c(1,3), las =1,  by.var = TRUE, eyes = FALSE, 
+                           xlab = "Bedingung", 
+                           ylab = "Selbst-Motivation", ylim = c(1,6),
+                           main = "Selbst-Motivation Prä-Post",
+                           family(serif),
+)
 
 # lme für Volition
 
