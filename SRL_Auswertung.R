@@ -467,6 +467,7 @@ lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
 # erster Versuch Mittelwerte graphisch darzustellen
+
 plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feedback,
               lty = c(1,3), las =1,  by.var = TRUE, eyes = FALSE, 
               xlab = "Bedingung", 
@@ -625,15 +626,19 @@ anova(baseline_chimeGesamt, CHIMEgesamt)
 
 lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
 
+
 # Korrelation state und trait Variablen --> funzt noch nicht
 
-KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_02","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
+aggdata <-aggregate(AD_ohne_Dropout, by =list(AD_ohne_Dropout$SERIAL), FUN=mean, na.rm=TRUE)
 
-cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_02,TE03_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
+cor(aggdata[c("SE01_03","SM02_01","LZ04_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
+
+aggdata %>% dplyr::select(SE01_03,SM02_01,LZ04_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
 
 library("apaTables")
 
-cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
+apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
+
 
 # grand mean centering --> noch nicht erfolgreich #### --> M = 0 prüfen 
 
