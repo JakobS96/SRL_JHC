@@ -644,6 +644,22 @@ motorbar <- motorbar + geom_bar(stat="identity", position = position_dodge()) +
   scale_fill_brewer(palette="Paired") + theme_minimal()
 motorbar
 
+# Alternative zum vorherigen Graphen
+
+motorbar <- ggplot(data=plotdat, aes(x = Feedback, y=Means, fill = Messzeitpunkt))
+motorbar <- motorbar + geom_bar(stat="identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin=Means-2*Serrs, ymax=Means+2*Serrs), width=.2,
+                position=position_dodge(.9)) +
+  labs(x="Gruppe", y = "Zielsetzung")+
+  scale_fill_manual(values=c('darkgray','lightgray'))+
+  theme_classic()
+
+motorbar <- motorbar + theme(
+  axis.title.x = element_text(size=14, face="bold"),
+  axis.title.y = element_text(size=14, face="bold"),
+  legend.title = element_text(size=14, face="bold"))
+motorbar
+
 # lme für Selbstmotivierung
 
 aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
