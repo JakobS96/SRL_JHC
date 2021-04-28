@@ -1,5 +1,8 @@
 
-# Laden der Pakete
+# 1 Organisatorisches ----
+
+# * 1.1 Laden der Pakete ----
+
 library(car)
 library(dplyr)
 library(EMAtools)
@@ -17,17 +20,17 @@ library(reshape)
 library(reshape2)
 library(semTools)
 
+# * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
-# Laden des Datensatzes und der Datei mit den Zusatzvariablen
-Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 15.04.
+Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 27.04.
 
 Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
-# Kodierung fehlender Werte
+# * * 1.2.1 Kodierung fehlender Werte ----
 
 Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
-# neue ZUsatzvariablen: 
+# ** 1.2.2 neue Zusatzvariablen ----
     # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
     # 2) FinishT1 (T1 Fragebogen ausgefüllt = 1; T1 Fragebogen nicht ausgefüllt = 0)
     # 3) FinishT2 (T2 Fragebogen ausgefüllt = 1; T2 Fragebogen nicht ausgefüllt = 0)
@@ -37,14 +40,19 @@ Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
 
 AD <- Alle_Daten_neu
 
-# Berechnen einer neuen Variable: dropout
+# * 1.3 Dropout bestimmen ----
+  # (Berechnen einer neuen Variable: dropout)
+
 AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA", 0,1))
 
 AD$dropout[is.na(AD$dropout)] <- 1
 
 describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
 
-# Skalenbildung T1
+
+# 2 Skalenbildung ---- 
+
+# * 2.1 Skalenbildung T1 ----
 
 AD$goalt1 <- (AD$T102_01 + AD$T102_02 + AD$T102_03 + AD$T102_04)/4
 
@@ -60,7 +68,8 @@ AD$prot1 <- (AD$T107_01 + AD$T107_02 + AD$T107_03 + AD$T107_04 + AD$T107_05 + AD
 
 AD$set1 <- (AD$T108_01 + AD$T108_02 + AD$T108_03 + AD$T108_04 + AD$T108_05 + AD$T108_06 + AD$T108_07+ AD$T108_08 + AD$T108_09)/9
 
-# Skalenbildung T2
+
+# * 2.2 Skalenbildung T2 ----
 
 AD$goalt2 <- (AD$T202_01 + AD$T202_02 + AD$T202_03 + AD$T202_04)/4
 
@@ -76,7 +85,8 @@ AD$prot2 <- (AD$T207_01 + AD$T207_02 + AD$T207_03 + AD$T207_04 + AD$T207_05 + AD
 
 AD$set2 <- (AD$T208_01 + AD$T208_02 + AD$T208_03 + AD$T208_04 + AD$T208_05 + AD$T208_06 + AD$T208_07+ AD$T208_08 + AD$T208_09)/9
 
-# Skalenbildung CHIME
+
+# * 2.3 Skalenbildung CHIME ----
 
 AD$chime1 <- (AD$FA02_01 + AD$FA02_05 + AD$FA02_14 + AD$FA02_29 + AD$FA02_34)/5
 
@@ -97,23 +107,31 @@ AD$chime8 <- (AD$FA02_03 + AD$FA02_06 + AD$FA02_15 + AD$FA02_24 + AD$FA02_37)/5
 AD$chimeGesamt <- (AD$chime1 + AD$chime2 + AD$chime3 + AD$chime4 + AD$chime5 + AD$chime6 + AD$chime7 + AD$chime8)/8
 
 
-# Subsets bilden (Dropout raus filtern)
+# 3 Bildung der benötigten Subsets ----
+
+# * 3.1 AD_ohne_Dropout ----
+
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
-# Subsets bilden (T1)
+# * 3.2 T1 ----
 
 D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
 
-# Subsets bilden (T2)
+# * 3.3 T2 ----
 
 D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
 
-# Subsets bilden (T1 & T2)
+# * 3.4 T1 & T2 ----
 
 D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
 D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
 
-# Subsets bilden (T1 & LP_T1-LP_T35)
+# * 3.5 T1 & T2 => CHIME ----
+
+D_T1T2_CHIME <- D_T1T2 
+D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+
+# * 3.6 T1 & LP_T1-LP_T35 ----
 
 D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
 D_LP <- filter(D_LP, TE16 != 2)
@@ -121,7 +139,9 @@ D_LP <- filter(D_LP, TE16 != 2)
 D_T1LP <- rbind(D_T1, D_LP)
 
 
-##### Reliabilitätsanalysen T1: Berechnung McDonalds Omega #####
+# 4 Reliabilitätsanalysen: Berechnung McDonalds Omega ----
+
+# * 4.1 Reliabilitäten: T1 ----
 
 # Zielsetzung: alpha = .68; omega = .76 
 omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
@@ -194,7 +214,7 @@ omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
                            "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT1_Gesamt)
 
-##### Reliabilitätsanalyse T2 #####
+# * 4.2 Reliabilitätsanalyse: T2 ----
 
 # Zielsetzung: alpha = .68; omega = .75
 omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
@@ -268,7 +288,7 @@ omegaChimeT2_Gesamt <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
 omega(omegaChimeT2_Gesamt)
 
 
-##### Deskriptive Analysen ##### 
+# 5 Deskriptive Analysen ----
 
 # Haeufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
 table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) 
@@ -291,7 +311,9 @@ describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
 
-##### t.tests für die Unterschiede zwischen Dropout (1) und kein Dropout (0) #####
+# 6 T-Tests (Gruppenvergleiche) ----
+
+# * 6.1 Unterschiede zwischen Dropout (1) und kein Dropout (0) => T1 ----
 
 AD$dropout.faktor <- factor(AD$dropout) # Dropout-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
 
@@ -303,46 +325,81 @@ leveneTest(AD$goalt1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
 goalt1_drop # n.s.
 
+ci.smd(ncp = -0.77618,
+       n.1 = 151, n.2 = 24) # Cohens d = -.17 
+
 # Selbstmotivierung
+describeBy(AD$mott1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$mott1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 mott1_drop <- t.test(AD$mott1 ~ AD$dropout, var.equal = TRUE)
 mott1_drop # n.s.
 
+ci.smd(ncp = -0.78887,
+       n.1 = 152, n.2 = 24) # Cohens d = -.17 
+
 # Volition
+describeBy(AD$volt1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$volt1, AD$dropout.faktor) # signifikant => Varianzhomogenität NICHT gegeben => Welch-Test
 
 volt1_drop <- t.test(AD$volt1 ~ AD$dropout)
 volt1_drop # n.s.
 
+ci.smd(ncp = 0.16259,
+       n.1 = 152, n.2 = 24) # Cohens d = .04 
+
 # Reflexion
+describeBy(AD$reft1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 reft1_drop <- t.test(AD$reft1 ~ AD$dropout, var.equal = TRUE)
 reft1_drop # n.s.
 
+ci.smd(ncp = 0.67199,
+       n.1 = 152, n.2 = 24) # Cohens d = .15 
+
 # Zeitplan
-leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+describeBy(AD$plant1, AD$dropout, mat = TRUE)
+
+leveneTest(AD$plant1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 plant1_drop <- t.test(AD$plant1 ~ AD$dropout, var.equal = TRUE)
 plant1_drop # n.s.
 
+ci.smd(ncp = 0.33985,
+       n.1 = 152, n.2 = 24) # Cohens d = .07
+
 # Prokrastination
+describeBy(AD$prot1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$prot1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 prot1_drop <- t.test(AD$prot1 ~ AD$dropout, var.equal = TRUE)
 prot1_drop # n.s.
 
+ci.smd(ncp = -1.5985,
+       n.1 = 151, n.2 = 24) # Cohens d = -.35
+
 # Selbstwirksamkeit
+describeBy(AD$set1, AD$dropout, mat = TRUE)
+
 leveneTest(AD$set1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
 
 set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
 set1_drop # n.s.
 
+ci.smd(ncp = -1.0324,
+       n.1 = 151, n.2 = 23) # Cohens d = -.23
 
-##### t.tests für die Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) bei T1 #####
+
+# * 6.2 Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) => T1 ----
 
 AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedback-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
+
+# * * 6.2.1 Trait Variablen ----
 
 # Zielsetzung 
 describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -421,35 +478,114 @@ set1_differences # n.s. p = .86
 ci.smd(ncp = 0.17729,
        n.1 = 74, n.2 = 77) # Cohens d = .03
 
+# * * 6.2.2 Achtsamkeitsinventar (CHIME) ---- 
+
 # CHIME Subskala 1 
-D_T1$Feedback.Faktor <- factor(D_T1$Feedback)
+D_T1$Achtsamkeit.Faktor <- factor(D_T1$Achtsamkeit) # Gruppe Achtsamkeit = 1; Gruppe Feedback = 0 
 
-describeBy(D_T1$chime1, D_T1$Feedback, mat = TRUE)
+describeBy(D_T1$chime1, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime1, D_T1$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime1, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
 
-chime1_differences <- t.test(D_T1$chime1 ~ D_T1$Feedback, var.equal = TRUE)
+chime1_differences <- t.test(D_T1$chime1 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime1_differences # signifikant p = .0054
 
-ci.smd(ncp = -2.8267,
-       n.1 = 73, n.2 = 76) # Cohens d = -.46
+ci.smd(ncp = 2.8267,
+       n.1 = 73, n.2 = 76) # Cohens d = .46
+
+# CHIME Subskala 2
+describeBy(D_T1$chime2, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime2, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime2_differences <- t.test(D_T1$chime2 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime2_differences # n.s. p = .28
+
+ci.smd(ncp = 1.0873,
+       n.1 = 73, n.2 = 77) # Cohens d = .18
+
+# Chime Subskala 3
+describeBy(D_T1$chime3, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime3, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime3_differences <- t.test(D_T1$chime3 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime3_differences # n.s. p = .10
+
+ci.smd(ncp = -1.6512,
+       n.1 = 73, n.2 = 77) # Cohens d = -.27
+
+# Chime Subskala 4
+describeBy(D_T1$chime4, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime4, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime4_differences <- t.test(D_T1$chime4 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime4_differences # n.s. p = .47
+
+ci.smd(ncp = 0.71652,
+       n.1 = 73, n.2 = 77) # Cohens d = .12
+
+# Chime Subskala 5
+describeBy(D_T1$chime5, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime5, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime5_differences <- t.test(D_T1$chime5 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime5_differences # n.s. p = .97
+
+ci.smd(ncp = 0.038648,
+       n.1 = 73, n.2 = 77) # Cohens d = .006
+
+# Chime Subskala 6
+describeBy(D_T1$chime6, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime6, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime6_differences <- t.test(D_T1$chime6 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime6_differences # signifikant p = .013
+
+ci.smd(ncp = -2.5027,
+       n.1 = 73, n.2 = 77) # Cohens d = -.41
+
+# Chime Subskala 7
+describeBy(D_T1$chime7, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime7, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime7_differences <- t.test(D_T1$chime7 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime7_differences # n.s. p = .86
+
+ci.smd(ncp = 0.17361,
+       n.1 = 73, n.2 = 77) # Cohens d = .03
+
+# Chime Subskala 8
+describeBy(D_T1$chime8, D_T1$Achtsamkeit, mat = TRUE)
+
+leveneTest(D_T1$chime8, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+
+chime8_differences <- t.test(D_T1$chime8 ~ D_T1$Achtsamkeit, var.equal = TRUE)
+chime8_differences # n.s. p = .36
+
+ci.smd(ncp = 0.91834,
+       n.1 = 73, n.2 = 77) # Cohens d = .15
 
 # CHIME Gesamt (über alle 8 Subskalen hinweg)
+describeBy(D_T1$chimeGesamt, D_T1$Achtsamkeit, mat = TRUE)
 
-describeBy(D_T1$chimeGesamt, D_T1$Feedback, mat = TRUE)
+leveneTest(D_T1$chimeGesamt, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
 
-leveneTest(D_T1$chimeGesamt, D_T1$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
-
-chimeGesamt_differences <- t.test(D_T1$chimeGesamt ~ D_T1$Feedback, var.equal = TRUE)
+chimeGesamt_differences <- t.test(D_T1$chimeGesamt ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chimeGesamt_differences # n.s. p = 0.61
 
-ci.smd(ncp = -0.51287,
-       n.1 = 73, n.2 = 76) # Cohens d = -.08
-
-# Korrelation zwischen Anzahl Lernplaner und Subset T1?
+ci.smd(ncp = 0.51287,
+       n.1 = 73, n.2 = 76) # Cohens d = .08
 
 
-##### T1-T2 ANOVAs #####
+
+# 7 T1-T2 ANOVAs ----
+
+# * 7.1 Trait Variablen ----
 
 # lme für Zielsetzung
 
@@ -636,53 +772,138 @@ lme.dscore(se,data=aggdata_long_SE,type="nlme")
 
 summary(se)
 
-# lme für CHIME Subskala 1 - VERSUCH
 
-D_T1T2_Test <- D_T1T2
+# * 7.2 Achtsamkeitsinventar (CHIME) ----
 
-D_T1T2_Test <- D_T1T2_Test %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+# lme für CHIME Subskala 1 (Achtsamkeit = 1; Feedback = 0)
 
-describeBy(D_T1T2_Test$chime1, list(D_T1T2_Test$TIME, D_T1T2_Test$Feedback), mat = TRUE) # Stichproben in der Achtsamkeitsbedingung noch nicht gleich groß
+describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_Test, method = "ML")
-CHIME1 <- lme(chime1~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_Test, method = "ML")
+baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME1 <- lme(chime1~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime1)
 anova(CHIME1) 
 anova(baseline_chime1, CHIME1)
 
-lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
+lme.dscore(CHIME1,data=D_T1T2_CHIME,type="nlme")
 
 
-D_T1T2_Test <- D_T1T2
+# lme für CHIME Subskala 2 (Achtsamkeit = 1; Feedback = 0)
 
-D_T1T2_Test <- D_T1T2_Test %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-describeBy(D_T1T2_Test$chime1, list(D_T1T2_Test$TIME, D_T1T2_Test$Achtsamkeit), mat = TRUE) # Stichproben in der Achtsamkeitsbedingung noch nicht gleich groß
+baseline_chime2 <- lme(chime2 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME2 <- lme(chime2~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
-baseline_chime1_1 <- lme(chime1 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_Test, method = "ML")
-CHIME1_1 <- lme(chime1~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_Test, method = "ML")
+anova(baseline_chime2)
+anova(CHIME2) 
+anova(baseline_chime2, CHIME2)
 
-anova(baseline_chime1_1)
-anova(CHIME1_1) 
-anova(baseline_chime1_1, CHIME1_1)
+lme.dscore(CHIME2,data=D_T1T2_CHIME,type="nlme")
 
-lme.dscore(CHIME1_1,data=D_T1T2_Test,type="nlme")
 
-# lme für CHIME Gesamt - VERSUCH
+# lme für CHIME Subskala 3 (Achtsamkeit = 1; Feedback = 0)
 
-describeBy(D_T1T2_Test$chimeGesamt, list(D_T1T2_Test$TIME, D_T1T2_Test$Feedback), mat = TRUE) # Stichproben in der Achtsamkeitsbedingung noch nicht gleich groß
+describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_Test, method = "ML")
-CHIMEgesamt <- lme(chimeGesamt~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_Test, method = "ML")
+baseline_chime3 <- lme(chime3 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME3 <- lme(chime3~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime3)
+anova(CHIME3) 
+anova(baseline_chime3, CHIME3)
+
+lme.dscore(CHIME3,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Subskala 4 (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+
+baseline_chime4 <- lme(chime4 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME4 <- lme(chime4~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime4)
+anova(CHIME4) 
+anova(baseline_chime4, CHIME4)
+
+lme.dscore(CHIME4,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Subskala 5 (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+
+baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME5 <- lme(chime5~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime5)
+anova(CHIME5) 
+anova(baseline_chime5, CHIME5)
+
+lme.dscore(CHIME5,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Subskala 6 (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+
+baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME6 <- lme(chime6~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime6)
+anova(CHIME6) 
+anova(baseline_chime6, CHIME6)
+
+lme.dscore(CHIME6,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Subskala 7 (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+
+baseline_chime7 <- lme(chime7 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME7 <- lme(chime7~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime7)
+anova(CHIME7) 
+anova(baseline_chime7, CHIME7)
+
+lme.dscore(CHIME7,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Subskala 8 (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+
+baseline_chime8 <- lme(chime8 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIME8 <- lme(chime8~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+
+anova(baseline_chime8)
+anova(CHIME8) 
+anova(baseline_chime8, CHIME8)
+
+lme.dscore(CHIME8,data=D_T1T2_CHIME,type="nlme")
+
+
+# lme für CHIME Gesamt (Achtsamkeit = 1; Feedback = 0)
+
+describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE)
+
+baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
+CHIMEgesamt <- lme(chimeGesamt~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chimeGesamt)
 anova(CHIMEgesamt) 
 anova(baseline_chimeGesamt, CHIMEgesamt)
 
-lme.dscore(CHIME1,data=D_T1T2_Test,type="nlme")
+lme.dscore(CHIMEgesamt,data=D_T1T2_CHIME,type="nlme")
 
-# Korrelation state und trait Variablen --> funzt noch nicht
+
+
+# 8 Korrelation state und trait Variablen ----
+    # => funzt noch nicht
 
 KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_01","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
 
@@ -692,7 +913,8 @@ library("apaTables")
 
 cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
 
-# grand mean centering --> noch nicht erfolgreich #### --> M = 0 prüfen 
+# 9 Grand mean centering ----
+    # => noch nicht erfolgreich #### --> M = 0 prüfen 
 
 D_T1LPgmc <- D_T1LP %>%
   mutate(
@@ -704,7 +926,7 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
-# ICC berechnen
+# 10 ICC berechnen ----
 
 ICCgoal <- ICCbare(SERIAL, TE03_01, AD_ohne_Dropout)
 ICCgoal
@@ -723,7 +945,8 @@ ICCsat
 ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
 ICCpro
 
-### der klägliche Versuch eines HLM (funzt nicht)
+# 11 der klägliche Versuch eines HLM ----
+    # (funzt nicht)
 
 # nach Field
 
