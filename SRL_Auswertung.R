@@ -708,7 +708,18 @@ lme.dscore(vol,data=aggdata_long_VOL,type="nlme")
 
 summary(vol)
 
+# weitere Graphik-Versuche (nicht zufrieden)
 
+aggdata_long_VOL$Feedback.Faktor <- factor(aggdata_long_VOL$Feedback, level = c(0,1), label = c("Achtsamkeit", "Feedback"))
+
+bar_Vol <- ggplot(aggdata_long_VOL, aes(TIME, VOL, fill = Feedback.Faktor))
+
+
+bar_Vol + stat_summary(fun.y = mean, geom = "bar", position = "dodge") + 
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", position = position_dodge(width = 0.90), width = 0.2) +
+  labs(x = "Messzeitpunkt", y = "Durchschnitt Volition", fill = "Bedingung")
+
+  
 # lme für Reflexion
 
 aggdata_long_REF <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("reft1", "reft2"), variable.name="TIME",value.name="REF", na.rm = TRUE)
