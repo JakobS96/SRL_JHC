@@ -791,6 +791,9 @@ summary(se)
 
 # * 7.2 Achtsamkeitsinventar (CHIME) ----
 
+D_T1T2_CHIME <- D_T1T2 
+D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+
 # lme für CHIME Subskala 1 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
@@ -799,7 +802,7 @@ baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_C
 CHIME1 <- lme(chime1~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime1)
-anova(CHIME1) 
+anova(CHIME1) # Achtsamkeit signifikant ( p = .0124, d = -.19)
 anova(baseline_chime1, CHIME1)
 
 lme.dscore(CHIME1,data=D_T1T2_CHIME,type="nlme")
@@ -855,7 +858,7 @@ baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_C
 CHIME5 <- lme(chime5~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime5)
-anova(CHIME5) 
+anova(CHIME5) # TIME signifikant (p = .0003, d = .54) 
 anova(baseline_chime5, CHIME5)
 
 lme.dscore(CHIME5,data=D_T1T2_CHIME,type="nlme")
@@ -869,7 +872,7 @@ baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_C
 CHIME6 <- lme(chime6~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime6)
-anova(CHIME6) 
+anova(CHIME6) # Achtsamkeit signifikant (p = .0013, d = .40)
 anova(baseline_chime6, CHIME6)
 
 lme.dscore(CHIME6,data=D_T1T2_CHIME,type="nlme")
@@ -911,7 +914,7 @@ baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Achtsamkeit, data 
 CHIMEgesamt <- lme(chimeGesamt~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chimeGesamt)
-anova(CHIMEgesamt) 
+anova(CHIMEgesamt) # TIME signifikant (p = .0265, d = .16)
 anova(baseline_chimeGesamt, CHIMEgesamt)
 
 lme.dscore(CHIMEgesamt,data=D_T1T2_CHIME,type="nlme")
