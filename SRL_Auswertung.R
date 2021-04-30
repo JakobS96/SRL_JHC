@@ -1098,3 +1098,27 @@ Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Fe
 summary(Selbstwirksamkeit.model)
 
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Zeitplan (TE06_01)
+Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Zeitplan.model)
+
+lme.dscore(Zeitplan.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Zufriedenheit (TE10_01)
+Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Zufriedenheit.model)
+
+lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Prokrastination (TE07_01)
+Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Prokrastination.model)
+
+lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Anstrengung (TE08_01)
+Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Anstrengung.model)
+
+lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
