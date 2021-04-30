@@ -22,7 +22,7 @@ library(semTools)
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
-Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 27.04.
+Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 30.04.
 
 Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
@@ -1047,3 +1047,54 @@ D_T1LPgmc$TE03_01fac <- factor(D_T1LPgmc$TE03_01) ## Im Zweifel löschen
 goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +DAYSchar | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
 
 selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  , random = ~ 1 + Feedback + days | idnr, data=data, na.action=na.omit, method='ML')
+
+
+
+# vermutlich FINALE Lösung: ----
+
+
+# (Zielerreichung => TE03_01;) => die Variable wird gar nicht ausgewertet :D Wir hatten Zielsetzung mit Zielerreichung verwechselt.
+
+# Zielsetzung (anspruchsvoll) => LZ04_01; ### gmc_GOALt1
+# Planung => PL01_01; ### gmc_PLANt1
+# intrinsische Motivation => SM02_02; ### gmc_MOTt1 
+# Selbstwirksamkeit => SE01_03; ### gmc_SEt1
+# Zeitplan => TE06_01; ### gmc_PLANt1
+# Zufriedenheit => TE10_01; ### KEIN mean centering
+# Prokrastination => TE07_01; ### gmc_PROt1
+# Anstrengung => TE08_01 ### KEIN mean centering
+
+
+# neues Subset mit den relevanten Variablen für die Mehrebenenanalyse
+D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
+
+# zusätzliche csv-Datei mit den gmc-Variablen
+gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
+
+# Zuordnung der gmc-Variablen im Subset D_T1LP_gmx2.0 zu den Seriennummern
+D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
+
+
+# Auswertung Zielsetzung (LZ04_01)
+Zielsetzung.model <- lme(LZ04_01 ~ Feedback + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Zielsetzung.model)
+
+lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Auswertung Planung (PL01_01)
+Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Planung.model)
+
+lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Auswertung intrinsische Motivation (SM02_02)
+Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Motivation.model)
+
+lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
+
+# Selbstwirksamkeit (SE01_03)
+Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Selbstwirksamkeit.model)
+
+lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
