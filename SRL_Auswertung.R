@@ -1081,11 +1081,22 @@ summary(Zielsetzung.model)
 
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
+D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback)
+line1 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, LZ04_01, colour = Feedback))
+
+
+line1 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zielsetzung", colour = "Feedback")
+
 # Auswertung Planung (PL01_01)
 Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
+
+line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
+
+
+line2 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Planung", colour = "Feedback")
 
 # Auswertung intrinsische Motivation (SM02_02)
 Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1098,6 +1109,11 @@ Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Fe
 summary(Selbstwirksamkeit.model)
 
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
+
+line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
+
+
+line4 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Selbstwirksamkeit", colour = "Feedback")
 
 # Zeitplan (TE06_01)
 Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
