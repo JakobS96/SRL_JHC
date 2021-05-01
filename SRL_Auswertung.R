@@ -1066,7 +1066,7 @@ selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  
 
 
 # neues Subset mit den relevanten Variablen für die Mehrebenenanalyse
-D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
+D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
 
 # zusätzliche csv-Datei mit den gmc-Variablen
 gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
