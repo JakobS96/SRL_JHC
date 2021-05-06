@@ -18,6 +18,7 @@ library(nortest)
 library(psych)
 library(reshape)
 library(reshape2)
+library(Rmisc)
 library(semTools)
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
@@ -1187,13 +1188,37 @@ line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
 line7 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Prokrastination", colour = "Feedback")
 
 # Anstrengung (TE08_01)
+describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
+
 Anstrengung.model <- lme(TE08_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
 lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line8 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE08_01, colour = Feedback))
+line8 <- ggplot(tgc, aes(WEEK, TE08_01, colour = Feedback))
 
-line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, conf.int = .90, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
+line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
 
+
+SummEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummEff
+
+pd <- position_dodge(0)
+
+PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE08_01-ci, ymax=TE08_01+ci), colour="black", width=.2, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Anstrengung") +
+  expand_limits(y=3) +                        
+  scale_y_continuous(breaks=3:6) +        
+  theme_bw() +
+  theme(legend.position="bottom")
+PlotEff
 
