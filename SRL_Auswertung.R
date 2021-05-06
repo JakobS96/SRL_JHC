@@ -106,6 +106,18 @@ AD$chime8 <- (AD$FA02_03 + AD$FA02_06 + AD$FA02_15 + AD$FA02_24 + AD$FA02_37)/5
 
 AD$chimeGesamt <- (AD$chime1 + AD$chime2 + AD$chime3 + AD$chime4 + AD$chime5 + AD$chime6 + AD$chime7 + AD$chime8)/8
 
+# * 2.4 Skalenbildung Evaluation Lernplaner ----
+
+AD$EVLP <- (AD$EV02_01 + AD$EV02_02+ AD$EV02_03 + AD$EV02_04 + AD$EV02_05 + AD$EV02_06)/6
+
+AD_ohne_Dropout$EVLP <- (AD_ohne_Dropout$EV02_01 + AD_ohne_Dropout$EV02_02+ AD_ohne_Dropout$EV02_03 + AD_ohne_Dropout$EV02_04 + AD_ohne_Dropout$EV02_05 + AD_ohne_Dropout$EV02_06)/6
+
+ # relevant ob Dropout oder nicht? Deskriptiv sowieso kaum Unterschiede
+
+# * 2.5 Skalenbildung Evaluation Feedback ----
+
+AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_ohne_Dropout$EV04_03 + AD_ohne_Dropout$EV04_04 + AD_ohne_Dropout$EV04_05)/5
+
 
 # 3 Bildung der benötigten Subsets ----
 
@@ -581,6 +593,30 @@ chimeGesamt_differences # n.s. p = 0.61
 ci.smd(ncp = 0.51287,
        n.1 = 73, n.2 = 76) # Cohens d = .08
 
+# * 6.3 Unterschiede Evaluation Lernplaner ----
+describeBy(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+EVLP_differences <- t.test(AD_ohne_Dropout$EVLP ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
+EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA 
+
+ci.smd(ncp = -3.5777,
+       n.1 = 79, n.2 = 74) # d = -.58 # warum minus d?
+
+# * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 (Ich würde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.) ---- 
+describeBy(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+
+EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
+EV02_05_differences # signfikant p < .001, d = -.57 --> LPF bewertet LP besser als LPA
+
+ci.smd(ncp = -1.4414,
+       n.1 = 79, n.2 = 74) # Cohens d = -.23
+
+# * 6.4 Evaluation Feedback ----
+describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.15, SD = 1.08
 
 
 # 7 T1-T2 ANOVAs ----
@@ -1078,6 +1114,8 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 # Auswertung Zielsetzung (LZ04_01)
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
+
+
 
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
