@@ -323,6 +323,9 @@ describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 # Vorwissen Thema Feedback, aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
+# Evaluation Feedback 
+describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.15, SD = 1.08
+
 
 # 6 T-Tests (Gruppenvergleiche) ----
 
@@ -611,13 +614,10 @@ describeBy(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
 
 EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-EV02_05_differences # signfikant p < .001, d = -.57 --> LPF bewertet LP besser als LPA
+EV02_05_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 
 ci.smd(ncp = -1.4414,
        n.1 = 79, n.2 = 74) # Cohens d = -.23
-
-# * 6.4 Evaluation Feedback ----
-describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.15, SD = 1.08
 
 
 # 7 T1-T2 ANOVAs ----
