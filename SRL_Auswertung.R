@@ -1199,6 +1199,7 @@ line8 <- ggplot(tgc, aes(WEEK, TE08_01, colour = Feedback))
 
 line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
 
+# Plot Anstrengung 
 
 SummEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummEff
