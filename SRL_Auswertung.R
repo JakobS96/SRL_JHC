@@ -1076,19 +1076,19 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 
 
 # Auswertung Zielsetzung (LZ04_01)
-Zielsetzung.model <- lme(LZ04_01 ~ Feedback + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
 
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
-D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback)
+D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, um mit Plots zu rechnen
 
 line1 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, LZ04_01, colour = Feedback))
 
 line1 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zielsetzung", colour = "Feedback")
 
 # Auswertung Planung (PL01_01)
-Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1098,7 +1098,7 @@ line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
 line2 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Planung", colour = "Feedback")
 
 # Auswertung intrinsische Motivation (SM02_02)
-Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
 
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1108,7 +1108,7 @@ line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
 line3 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Motivation", colour = "Feedback")
 
 # Selbstwirksamkeit (SE01_03)
-Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1118,7 +1118,7 @@ line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
 line4 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Selbstwirksamkeit", colour = "Feedback")
 
 # Zeitplan (TE06_01)
-Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zeitplan.model <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
 
 lme.dscore(Zeitplan.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1128,7 +1128,7 @@ line5 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE06_01, colour = Feedback))
 line5 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zeitplanung", colour = "Feedback")
 
 # Zufriedenheit (TE10_01)
-Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zufriedenheit.model <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
 lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1138,8 +1138,9 @@ line6 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE10_01, colour = Feedback))
 line6 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zufriedenheit", colour = "Feedback")
 
 # Prokrastination (TE07_01)
-Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Prokrastination.model <- lme(TE07_01 ~ Feedback*TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
+
 
 lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1148,11 +1149,13 @@ line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
 line7 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Prokrastination", colour = "Feedback")
 
 # Anstrengung (TE08_01)
-Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Anstrengung.model <- lme(TE08_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
 lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
 
 line8 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE08_01, colour = Feedback))
 
-line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
+line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, conf.int = .90, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
+
+
