@@ -1216,9 +1216,9 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
   ggtitle("Anstrengung") +
-  expand_limits(y=3) +                        
-  scale_y_continuous(breaks=3:6) +        
+  expand_limits(y=4:5) +                        
+  scale_y_continuous(breaks=4:5) +        
   theme_bw() +
-  theme(legend.position="bottom")
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotEff
 
