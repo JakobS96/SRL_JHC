@@ -1126,6 +1126,30 @@ line1 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, LZ04_01, colour = Feedback))
 
 line1 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zielsetzung", colour = "Feedback")
 
+# Plot Zielsetzung
+
+SummGoal <- summarySE(D_T1LP_gmc2.0, measurevar="LZ04_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummGoal
+
+pd <- position_dodge(0)
+
+PlotGoal <- ggplot(SummGoal, aes(x=WEEK, y=LZ04_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=LZ04_01-ci, ymax=LZ04_01+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zielsetzung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotGoal
+
 # Auswertung Planung (PL01_01)
 Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
@@ -1135,6 +1159,30 @@ lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
 line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
 
 line2 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Planung", colour = "Feedback")
+
+# Plot Planung
+
+SummPlan <- summarySE(D_T1LP_gmc2.0, measurevar="PL01_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummPlan
+
+pd <- position_dodge(0)
+
+PlotPlan <- ggplot(SummPlan, aes(x=WEEK, y=PL01_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=PL01_01-ci, ymax=PL01_01+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Planung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotPlan
 
 # Auswertung intrinsische Motivation (SM02_02)
 Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1146,6 +1194,30 @@ line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
 
 line3 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Motivation", colour = "Feedback")
 
+# Plot intrinsische Motivation
+
+SummMot <- summarySE(D_T1LP_gmc2.0, measurevar="SM02_02", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummMot
+
+pd <- position_dodge(0)
+
+PlotMot <- ggplot(SummMot, aes(x=WEEK, y=SM02_02, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=SM02_02-ci, ymax=SM02_02+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Motivation") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotMot
+
 # Selbstwirksamkeit (SE01_03)
 Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
@@ -1155,6 +1227,30 @@ lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
 line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
 
 line4 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Selbstwirksamkeit", colour = "Feedback")
+
+# Plot Selbstwirksamkeit
+
+SummSe <- summarySE(D_T1LP_gmc2.0, measurevar="SE01_03", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummSe
+
+pd <- position_dodge(0)
+
+PlotSe <- ggplot(SummSe, aes(x=WEEK, y=SE01_03, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=SE01_03-ci, ymax=SE01_03+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Selbstwirksamkeit") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotSe
 
 # Zeitplan (TE06_01)
 Zeitplan.model <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1166,6 +1262,30 @@ line5 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE06_01, colour = Feedback))
 
 line5 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zeitplanung", colour = "Feedback")
 
+# Plot Zeitplan
+
+SummTime <- summarySE(D_T1LP_gmc2.0, measurevar="TE06_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummTime
+
+pd <- position_dodge(0)
+
+PlotTime <- ggplot(SummTime, aes(x=WEEK, y=TE06_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE06_01-ci, ymax=TE06_01+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zeitplanung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotTime
+
 # Zufriedenheit (TE10_01)
 Zufriedenheit.model <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
@@ -1175,6 +1295,30 @@ lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
 line6 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE10_01, colour = Feedback))
 
 line6 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zufriedenheit", colour = "Feedback")
+
+# Plot Zufriedenheit
+
+SummSat <- summarySE(D_T1LP_gmc2.0, measurevar="TE10_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummSat
+
+pd <- position_dodge(0)
+
+PlotSat <- ggplot(SummSat, aes(x=WEEK, y=TE10_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE10_01-ci, ymax=TE10_01+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zufriedenheit") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotSat
 
 # Prokrastination (TE07_01)
 Prokrastination.model <- lme(TE07_01 ~ Feedback*TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1187,6 +1331,29 @@ line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
 
 line7 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Prokrastination", colour = "Feedback")
 
+# Plot Prokrastination
+
+SummPro <- summarySE(D_T1LP_gmc2.0, measurevar="TE07_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
+SummPro
+
+pd <- position_dodge(0)
+
+PlotPro <- ggplot(SummPro, aes(x=WEEK, y=TE07_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE07_01-ci, ymax=TE07_01+ci), colour="black", width=.15, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Prokrastination") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+PlotPro
 # Anstrengung (TE08_01)
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
@@ -1207,7 +1374,7 @@ SummEff
 pd <- position_dodge(0)
 
 PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedback)) + 
-  geom_errorbar(aes(ymin=TE08_01-ci, ymax=TE08_01+ci), colour="black", width=.2, position=pd) +
+  geom_errorbar(aes(ymin=TE08_01-ci, ymax=TE08_01+ci), colour="black", width=.15, position=pd) +
   geom_line(position=pd) +
   geom_point(position=pd, size=2, fill="white") + 
   xlab("Wochen") +
@@ -1217,8 +1384,8 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
   ggtitle("Anstrengung") +
-  expand_limits(y=4:5) +                        
-  scale_y_continuous(breaks=4:5) +        
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotEff
