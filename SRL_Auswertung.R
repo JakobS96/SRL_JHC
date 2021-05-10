@@ -1582,4 +1582,4 @@ Prokrastination.model2 <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random 
 
 anova(Prokrastination.model, Prokrastination.model2) # Modellfit wird schlechter, wenn Interaktion betrachtet wird 
 
-cor(AD_ohne_Dropout$goal1, AD_ohne_Dropout$TE08_01)
+
