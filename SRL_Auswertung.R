@@ -1150,6 +1150,27 @@ PlotGoal <- ggplot(SummGoal, aes(x=WEEK, y=LZ04_01, colour=Feedback, group=Feedb
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotGoal
 
+dayGoal <- summarySE(D_T1LP_gmc2.0, measurevar="LZ04_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayGoal
+
+pd <- position_dodge(0)
+PlotGoalDay <- ggplot(dayGoal, aes(x=TIME2.0, y=LZ04_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=LZ04_01-ci, ymax=LZ04_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zielsetzung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotGoalDay
 # Auswertung Planung (PL01_01)
 Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
@@ -1183,6 +1204,29 @@ PlotPlan <- ggplot(SummPlan, aes(x=WEEK, y=PL01_01, colour=Feedback, group=Feedb
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotPlan
+
+# Plot (Tage) für Planung
+dayPlan <- summarySE(D_T1LP_gmc2.0, measurevar="PL01_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayPlan
+
+pd <- position_dodge(0)
+PlotPlanDay <- ggplot(dayPlan, aes(x=TIME2.0, y=PL01_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=PL01_01-ci, ymax=PL01_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Planung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotPlanDay
 
 # Auswertung intrinsische Motivation (SM02_02)
 Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1218,6 +1262,29 @@ PlotMot <- ggplot(SummMot, aes(x=WEEK, y=SM02_02, colour=Feedback, group=Feedbac
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotMot
 
+# Plot (Tage) für Motivation
+
+dayMot <- summarySE(D_T1LP_gmc2.0, measurevar="SM02_02", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayMot
+
+pd <- position_dodge(0)
+PlotMotDay <- ggplot(dayMot, aes(x=TIME2.0, y=SM02_02, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=SM02_02-ci, ymax=SM02_02+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Motivation") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotMotDay
 # Selbstwirksamkeit (SE01_03)
 Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
@@ -1252,6 +1319,28 @@ PlotSe <- ggplot(SummSe, aes(x=WEEK, y=SE01_03, colour=Feedback, group=Feedback)
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotSe
 
+# Plot (Tage) für Selbstwirksamkeit
+daySe <- summarySE(D_T1LP_gmc2.0, measurevar="SE01_03", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+daySe
+
+pd <- position_dodge(0)
+PlotSeDay <- ggplot(daySe, aes(x=TIME2.0, y=SE01_03, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=SE01_03-ci, ymax=SE01_03+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Selbstwirksamkeit") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotSeDay
 # Zeitplan (TE06_01)
 Zeitplan.model <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
@@ -1285,6 +1374,29 @@ PlotTime <- ggplot(SummTime, aes(x=WEEK, y=TE06_01, colour=Feedback, group=Feedb
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotTime
+
+# Plot (Tage) für Zeitplanung
+dayTime <- summarySE(D_T1LP_gmc2.0, measurevar="TE06_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayTime
+
+pd <- position_dodge(0)
+PlotTimeDay <- ggplot(dayTime, aes(x=TIME2.0, y=TE06_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE06_01-ci, ymax=TE06_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zeitplanung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotTimeDay
 
 # Zufriedenheit (TE10_01)
 Zufriedenheit.model <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1320,10 +1432,32 @@ PlotSat <- ggplot(SummSat, aes(x=WEEK, y=TE10_01, colour=Feedback, group=Feedbac
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotSat
 
-# Prokrastination (TE07_01)
-Prokrastination.model <- lme(TE07_01 ~ Feedback*TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
-summary(Prokrastination.model)
+# Plot (Tage) für Zufriedenheit
+daySat <- summarySE(D_T1LP_gmc2.0, measurevar="TE10_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+daySat
 
+pd <- position_dodge(0)
+PlotSatDay <- ggplot(daySat, aes(x=TIME2.0, y=TE10_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE10_01-ci, ymax=TE10_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Zufriedenheit") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotSatDay
+
+# Prokrastination (TE07_01)
+Prokrastination.model <- lme(TE07_01 ~ Feedback* TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Prokrastination.model)
 
 lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1354,6 +1488,30 @@ PlotPro <- ggplot(SummPro, aes(x=WEEK, y=TE07_01, colour=Feedback, group=Feedbac
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotPro
+
+# Plot (Tage) für Prokrastination
+dayPro <- summarySE(D_T1LP_gmc2.0, measurevar="TE07_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayPro
+
+pd <- position_dodge(0)
+PlotProDay <- ggplot(dayPro, aes(x=TIME2.0, y=TE07_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE07_01-ci, ymax=TE07_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Prokrastination") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotProDay
+
 # Anstrengung (TE08_01)
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
@@ -1390,3 +1548,38 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotEff
 
+# Plot (Tage) für Anstrengung 
+dayEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
+dayEff
+
+PlotEffDay <- ggplot(dayEff, aes(x=TIME2.0, y=TE08_01, colour=Feedback, group=Feedback)) + 
+  geom_errorbar(aes(ymin=TE08_01-ci, ymax=TE08_01+ci), colour="black", width=.5, position=pd) +
+  geom_line(position=pd) +
+  geom_point(position=pd, size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("") +
+  scale_colour_hue(name="Gruppe",    
+                   breaks=c("0", "1"),
+                   labels=c("Achtsamkeit", "Feedback"),
+                   l=40) +                    
+  ggtitle("Anstrengung") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(breaks=2:6) +        
+  theme_bw() +
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
+PlotEffDay
+
+
+#### Genauere Betrachtung der Ergebnisse
+
+
+# Modellvergleich für Prokrastination --> Sinnvoll, um Interaktionen nicht rechnen zu müssen, wenn Modelle dadurch schlechter werden
+Prokrastination.model <- lme(TE07_01 ~ Feedback*TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+
+Prokrastination.model2 <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+
+
+anova(Prokrastination.model, Prokrastination.model2) # Modellfit wird schlechter, wenn Interaktion betrachtet wird 
+
+cor(AD_ohne_Dropout$goal1, AD_ohne_Dropout$TE08_01)
