@@ -1559,7 +1559,6 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotEff
 
-<<<<<<< HEAD
 # Plot (Tage) für Anstrengung 
 dayEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayEff
@@ -1594,7 +1593,7 @@ Prokrastination.model2 <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random 
 
 anova(Prokrastination.model, Prokrastination.model2) # Modellfit wird schlechter, wenn Interaktion betrachtet wird 
 
-=======
+
 
 # 12 Deskriptive Betrachtung der Verweildauer der Achtsamkeitsimpulse ----
 
