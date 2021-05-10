@@ -20,6 +20,7 @@ library(reshape)
 library(reshape2)
 library(Rmisc)
 library(semTools)
+library(texreg)
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -27,19 +28,25 @@ Alle_Daten <- read.csv2(file.choose()) # Datei: Alle_Daten_Stand 01.05.
 
 Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
+Achtsamkeit_Verweildauer <- read.csv2(file.choose()) # Datei: Daten_Achtsamkeit_Verweildauer
+
 # * * 1.2.1 Kodierung fehlender Werte ----
 
 Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
+Achtsamkeit_Verweildauer[Achtsamkeit_Verweildauer == -9 | Achtsamkeit_Verweildauer == -1 | Achtsamkeit_Verweildauer == ""] <- NA
+
 # ** 1.2.2 neue Zusatzvariablen ----
     # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
-    # 2) FinishT1 (T1 Fragebogen ausgefüllt = 1; T1 Fragebogen nicht ausgefüllt = 0)
-    # 3) FinishT2 (T2 Fragebogen ausgefüllt = 1; T2 Fragebogen nicht ausgefüllt = 0)
-    # 4) Finish18 (mehr 17 Tagen Lernplaner ausgefüllt = 1; weniger als 17 Tage Lernplaner ausgefüllt = 0)
+    # 2) FinishT1 (T1 Fragebogen ausgefuellt = 1; T1 Fragebogen nicht ausgefuellt = 0)
+    # 3) FinishT2 (T2 Fragebogen ausgefuellt = 1; T2 Fragebogen nicht ausgefuellt = 0)
+    # 4) Finish18 (mehr 17 Tagen Lernplaner ausgefuellt = 1; weniger als 17 Tage Lernplaner ausgefuellt = 0)
 
 Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
 
 AD <- Alle_Daten_neu
+
+Achtsamkeit_Verweildauer <- left_join(Achtsamkeit_Verweildauer, Zusatzvariablen, by = "SERIAL")
 
 # * 1.3 Dropout bestimmen ----
   # (Berechnen einer neuen Variable: dropout)
@@ -120,11 +127,13 @@ AD_ohne_Dropout$EVLP <- (AD_ohne_Dropout$EV02_01 + AD_ohne_Dropout$EV02_02+ AD_o
 AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_ohne_Dropout$EV04_03 + AD_ohne_Dropout$EV04_04 + AD_ohne_Dropout$EV04_05)/5
 
 
-# 3 Bildung der benötigten Subsets ----
+# 3 Bildung der ben?tigten Subsets ----
 
-# * 3.1 AD_ohne_Dropout ----
+# * 3.1 AD_ohne_Dropout, Achtsamkeit_ohne_Dropout ----
 
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
+
+Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA")
 
 # * 3.2 T1 ----
 
@@ -152,9 +161,9 @@ D_LP <- filter(D_LP, TE16 != 2)
 D_T1LP <- rbind(D_T1, D_LP)
 
 
-# 4 Reliabilitätsanalysen: Berechnung McDonalds Omega ----
+# 4 Reliabilitaetsanalysen: Berechnung McDonalds Omega ----
 
-# * 4.1 Reliabilitäten: T1 ----
+# * 4.1 Reliabilitaeten: T1 ----
 
 # Zielsetzung: alpha = .68; omega = .76 
 omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
@@ -184,19 +193,19 @@ omega(omegaprot1)
 omegaset1 <- AD_ohne_Dropout[c("T108_01", "T108_02", "T108_03","T108_04","T108_05","T108_06","T108_07","T108_08","T108_09")]
 omega(omegaset1)
 
-# Chime (T1_1) Gewahrsein gegenüber inneren Erfahrungen: alpha = .70; omega = .75
+# Chime (T1_1) Gewahrsein gegenueber inneren Erfahrungen: alpha = .70; omega = .75
 omegaChimeT1_1 <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
 omega(omegaChimeT1_1)
 
-# Chime (T1_2) Gewahrsein gegenüber äußeren Erfahrungen: alpha = .77; omega = .81
+# Chime (T1_2) Gewahrsein gegenueber aeu?eren Erfahrungen: alpha = .77; omega = .81
 omegaChimeT1_2 <- D_T1[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
 omega(omegaChimeT1_2)
 
-# Chime (T1_3) bewusstes Handeln, Gegenwärtigkeit: alpha = .60; omega = .67
+# Chime (T1_3) bewusstes Handeln, Gegenwaertigkeit: alpha = .60; omega = .67
 omegaChimeT1_3 <- D_T1[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
 omega(omegaChimeT1_3)
 
-# Chime (T1_4) annehmende, nicht-urteilende, mitfühlende Haltung: alpha = .88; omega = .90
+# Chime (T1_4) annehmende, nicht-urteilende, mitfuehlende Haltung: alpha = .88; omega = .90
 omegaChimeT1_4 <- D_T1[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
 omega(omegaChimeT1_4)
 
@@ -227,7 +236,7 @@ omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
                            "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT1_Gesamt)
 
-# * 4.2 Reliabilitätsanalyse: T2 ----
+# * 4.2 Reliabilitaetsanalyse: T2 ----
 
 # Zielsetzung: alpha = .68; omega = .75
 omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
@@ -257,19 +266,19 @@ omega(omegaprot2)
 omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
 omega(omegaset2)
 
-# Chime (T2_1) Gewahrsein gegenüber inneren Erfahrungen: alpha = .75; omega = .81
+# Chime (T2_1) Gewahrsein gegenueber inneren Erfahrungen: alpha = .75; omega = .81
 omegaChimeT2_1 <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
 omega(omegaChimeT2_1)
 
-# Chime (T2_2) Gewahrsein gegenüber äußeren Erfahrungen: alpha = .81; omega = .82
+# Chime (T2_2) Gewahrsein gegenueber aeu?eren Erfahrungen: alpha = .81; omega = .82
 omegaChimeT2_2 <- D_T2[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
 omega(omegaChimeT2_2)
 
-# Chime (T2_3) bewusstes Handeln, Gegenwärtigkeit: alpha = .61; omega = .65
+# Chime (T2_3) bewusstes Handeln, Gegenwaertigkeit: alpha = .61; omega = .65
 omegaChimeT2_3 <- D_T2[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
 omega(omegaChimeT2_3)
 
-# Chime (T2_4) annehmende, nicht-urteilende, mitfühlende Haltung: alpha = .88; omega = .90
+# Chime (T2_4) annehmende, nicht-urteilende, mitfuehlende Haltung: alpha = .88; omega = .90
 omegaChimeT2_4 <- D_T2[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
 omega(omegaChimeT2_4)
 
@@ -309,7 +318,7 @@ table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback)
 # Alter aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
-# vollständig ausgefüllte Lernplaner, aufgeteilt nach Bedingung
+# vollstaendig ausgefuellte Lernplaner, aufgeteilt nach Bedingung
 describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) 
 table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback)
 
@@ -336,7 +345,7 @@ AD$dropout.faktor <- factor(AD$dropout) # Dropout-Variable in einen Faktor konve
 # Zielsetzung 
 describeBy(AD$goalt1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$goalt1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$goalt1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 goalt1_drop <- t.test(AD$goalt1 ~ AD$dropout, var.equal = TRUE)
 goalt1_drop # n.s.
@@ -347,7 +356,7 @@ ci.smd(ncp = -0.77618,
 # Selbstmotivierung
 describeBy(AD$mott1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$mott1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$mott1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 mott1_drop <- t.test(AD$mott1 ~ AD$dropout, var.equal = TRUE)
 mott1_drop # n.s.
@@ -358,7 +367,7 @@ ci.smd(ncp = -0.78887,
 # Volition
 describeBy(AD$volt1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$volt1, AD$dropout.faktor) # signifikant => Varianzhomogenität NICHT gegeben => Welch-Test
+leveneTest(AD$volt1, AD$dropout.faktor) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
 
 volt1_drop <- t.test(AD$volt1 ~ AD$dropout)
 volt1_drop # n.s.
@@ -369,7 +378,7 @@ ci.smd(ncp = 0.16259,
 # Reflexion
 describeBy(AD$reft1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$reft1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 reft1_drop <- t.test(AD$reft1 ~ AD$dropout, var.equal = TRUE)
 reft1_drop # n.s.
@@ -380,7 +389,7 @@ ci.smd(ncp = 0.67199,
 # Zeitplan
 describeBy(AD$plant1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$plant1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$plant1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 plant1_drop <- t.test(AD$plant1 ~ AD$dropout, var.equal = TRUE)
 plant1_drop # n.s.
@@ -391,7 +400,7 @@ ci.smd(ncp = 0.33985,
 # Prokrastination
 describeBy(AD$prot1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$prot1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$prot1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 prot1_drop <- t.test(AD$prot1 ~ AD$dropout, var.equal = TRUE)
 prot1_drop # n.s.
@@ -402,7 +411,7 @@ ci.smd(ncp = -1.5985,
 # Selbstwirksamkeit
 describeBy(AD$set1, AD$dropout, mat = TRUE)
 
-leveneTest(AD$set1, AD$dropout.faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD$set1, AD$dropout.faktor) # n.s. => Varianzhomogenitaet gegeben
 
 set1_drop <- t.test(AD$set1 ~ AD$dropout, var.equal = TRUE)
 set1_drop # n.s.
@@ -413,14 +422,14 @@ ci.smd(ncp = -1.0324,
 
 # * 6.2 Unterschiede zwischen LPF (Feedback) und LPA (Achtsamkeit) => T1 ----
 
-AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedback-Variable in einen Faktor konvertiert, um Levene Test rechnen zu können.
+AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedback-Variable in einen Faktor konvertiert, um Levene Test rechnen zu koennen.
 
 # * * 6.2.1 Trait Variablen ----
 
 # Zielsetzung 
 describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 goalt1_differences # n.s. p = .07
@@ -431,7 +440,7 @@ ci.smd(ncp = -1.835,
 # Selbstmotivierung
 describeBy(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 mott1_differences # n.s. p = .13
@@ -442,7 +451,7 @@ ci.smd(ncp = -1.5245,
 # Volition 
 describeBy(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 volt1_differences # n.s. P = .72
@@ -453,7 +462,7 @@ ci.smd(ncp = -0.36545,
 # Reflexion 
 describeBy(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 reft1_differences # n.s. P = .58
@@ -464,7 +473,7 @@ ci.smd(ncp = -0.56251,
 # Zeitplan
 describeBy(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 plant1_differences # n.s. p = .13
@@ -475,7 +484,7 @@ ci.smd(ncp = -1.5088,
 # Prokrastination
 describeBy(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 prot1_differences # n.s. p = .99
@@ -486,7 +495,7 @@ ci.smd(ncp = -0.016574,
 # Selbstwirksamkeit
 describeBy(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 set1_differences # n.s. p = .86
@@ -501,7 +510,7 @@ D_T1$Achtsamkeit.Faktor <- factor(D_T1$Achtsamkeit) # Gruppe Achtsamkeit = 1; Gr
 
 describeBy(D_T1$chime1, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime1, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime1, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime1_differences <- t.test(D_T1$chime1 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime1_differences # signifikant p = .0054
@@ -512,7 +521,7 @@ ci.smd(ncp = 2.8267,
 # CHIME Subskala 2
 describeBy(D_T1$chime2, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime2, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime2, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime2_differences <- t.test(D_T1$chime2 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime2_differences # n.s. p = .28
@@ -523,7 +532,7 @@ ci.smd(ncp = 1.0873,
 # Chime Subskala 3
 describeBy(D_T1$chime3, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime3, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime3, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime3_differences <- t.test(D_T1$chime3 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime3_differences # n.s. p = .10
@@ -534,7 +543,7 @@ ci.smd(ncp = -1.6512,
 # Chime Subskala 4
 describeBy(D_T1$chime4, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime4, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime4, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime4_differences <- t.test(D_T1$chime4 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime4_differences # n.s. p = .47
@@ -545,7 +554,7 @@ ci.smd(ncp = 0.71652,
 # Chime Subskala 5
 describeBy(D_T1$chime5, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime5, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime5, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime5_differences <- t.test(D_T1$chime5 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime5_differences # n.s. p = .97
@@ -556,7 +565,7 @@ ci.smd(ncp = 0.038648,
 # Chime Subskala 6
 describeBy(D_T1$chime6, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime6, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime6, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime6_differences <- t.test(D_T1$chime6 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime6_differences # signifikant p = .013
@@ -567,7 +576,7 @@ ci.smd(ncp = -2.5027,
 # Chime Subskala 7
 describeBy(D_T1$chime7, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime7, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime7, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime7_differences <- t.test(D_T1$chime7 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime7_differences # n.s. p = .86
@@ -578,7 +587,7 @@ ci.smd(ncp = 0.17361,
 # Chime Subskala 8
 describeBy(D_T1$chime8, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chime8, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chime8, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chime8_differences <- t.test(D_T1$chime8 ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chime8_differences # n.s. p = .36
@@ -586,10 +595,10 @@ chime8_differences # n.s. p = .36
 ci.smd(ncp = 0.91834,
        n.1 = 73, n.2 = 77) # Cohens d = .15
 
-# CHIME Gesamt (über alle 8 Subskalen hinweg)
+# CHIME Gesamt (?ber alle 8 Subskalen hinweg)
 describeBy(D_T1$chimeGesamt, D_T1$Achtsamkeit, mat = TRUE)
 
-leveneTest(D_T1$chimeGesamt, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(D_T1$chimeGesamt, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 chimeGesamt_differences <- t.test(D_T1$chimeGesamt ~ D_T1$Achtsamkeit, var.equal = TRUE)
 chimeGesamt_differences # n.s. p = 0.61
@@ -600,7 +609,7 @@ ci.smd(ncp = 0.51287,
 # * 6.3 Unterschiede Evaluation Lernplaner ----
 describeBy(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 EVLP_differences <- t.test(AD_ohne_Dropout$EVLP ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA 
@@ -608,10 +617,10 @@ EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 ci.smd(ncp = -3.5777,
        n.1 = 79, n.2 = 74) # d = -.58 # warum minus d?
 
-# * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 (Ich würde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.) ---- 
+# * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 (Ich wuerde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.) ---- 
 describeBy(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenität gegeben
+leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EV02_05_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
@@ -624,11 +633,11 @@ ci.smd(ncp = -1.4414,
 
 # * 7.1 Trait Variablen ----
 
-# lme für Zielsetzung
+# lme fuer Zielsetzung
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
-aggdata_long_GOAL <- aggdata_long_GOAL %>% group_by(SERIAL) %>% filter(n()>1) # Filtern einzelner Seriennummern, die nur T1 oder nur T2 ausgefüllt haben
+aggdata_long_GOAL <- aggdata_long_GOAL %>% group_by(SERIAL) %>% filter(n()>1) # Filtern einzelner Seriennummern, die nur T1 oder nur T2 ausgefuellt haben
 
 describeBy(aggdata_long_GOAL$GOAL, list(aggdata_long_GOAL$TIME, aggdata_long_GOAL$Feedback), mat = TRUE) 
 
@@ -641,7 +650,7 @@ anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 
-summary(goal) # Warum werden die Koeffizienten für Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
+summary(goal) # Warum werden die Koeffizienten fuer Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
 
 # erster Versuch Mittelwerte graphisch darzustellen
 plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feedback,
@@ -651,7 +660,7 @@ plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feed
               main = "Zielsetzung Prä-Post",
               family(serif),
               )
-# Versuch die Graphik schön darzustellen
+# Versuch die Graphik schoen darzustellen
 
 aggdata_GOAL_plot <- melt(D_T1T2,id.vars=c("Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 cell1 <- subset(aggdata_GOAL_plot, Feedback == "0" & TIME == "goalt1")
@@ -697,7 +706,7 @@ motorbar <- motorbar + theme(
   legend.title = element_text(size=14, face="bold"))
 motorbar
 
-# lme für Selbstmotivierung
+# lme fuer Selbstmotivierung
 
 aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
 
@@ -726,7 +735,7 @@ plot_GOAL <- error.bars.by(data.frame(D_T1T2$mott1, D_T1T2$mott2), D_T1T2$Feedba
                            family(serif),
 )
 
-# lme für Volition
+# lme fuer Volition
 
 aggdata_long_VOL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("volt1", "volt2"), variable.name="TIME",value.name="VOL", na.rm = TRUE)
 
@@ -757,7 +766,7 @@ bar_Vol + stat_summary(fun.y = mean, geom = "bar", position = "dodge") +
   labs(x = "Messzeitpunkt", y = "Durchschnitt Volition", fill = "Bedingung")
 
   
-# lme für Reflexion
+# lme fuer Reflexion
 
 aggdata_long_REF <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("reft1", "reft2"), variable.name="TIME",value.name="REF", na.rm = TRUE)
 
@@ -777,7 +786,7 @@ lme.dscore(ref,data=aggdata_long_REF,type="nlme")
 summary(ref)
 
 
-# lme für Zeitplan
+# lme fuer Zeitplan
 
 aggdata_long_PLAN <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("plant1", "plant2"), variable.name="TIME",value.name="PLAN", na.rm = TRUE)
 
@@ -797,7 +806,7 @@ lme.dscore(plan,data=aggdata_long_PLAN,type="nlme")
 summary(plan)
 
 
-# lme für Prokrastination
+# lme fuer Prokrastination
 
 aggdata_long_PRO <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("prot1", "prot2"), variable.name="TIME",value.name="PRO", na.rm = TRUE)
 
@@ -817,7 +826,7 @@ lme.dscore(pro,data=aggdata_long_PRO,type="nlme")
 summary(pro)
 
 
-# lme für Selbstwirksamkeit
+# lme fuer Selbstwirksamkeit
 
 aggdata_long_SE <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("set1", "set2"), variable.name="TIME",value.name="SE", na.rm = TRUE)
 
@@ -842,7 +851,7 @@ summary(se)
 D_T1T2_CHIME <- D_T1T2 
 D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
 
-# lme für CHIME Subskala 1 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 1 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -856,7 +865,7 @@ anova(baseline_chime1, CHIME1)
 lme.dscore(CHIME1,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 2 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 2 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -870,7 +879,7 @@ anova(baseline_chime2, CHIME2)
 lme.dscore(CHIME2,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 3 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 3 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -884,7 +893,7 @@ anova(baseline_chime3, CHIME3)
 lme.dscore(CHIME3,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 4 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 4 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -898,7 +907,7 @@ anova(baseline_chime4, CHIME4)
 lme.dscore(CHIME4,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 5 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 5 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -912,7 +921,7 @@ anova(baseline_chime5, CHIME5)
 lme.dscore(CHIME5,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 6 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 6 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -926,7 +935,7 @@ anova(baseline_chime6, CHIME6)
 lme.dscore(CHIME6,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 7 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 7 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -940,7 +949,7 @@ anova(baseline_chime7, CHIME7)
 lme.dscore(CHIME7,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Subskala 8 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 8 (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
@@ -954,7 +963,7 @@ anova(baseline_chime8, CHIME8)
 lme.dscore(CHIME8,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme für CHIME Gesamt (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Gesamt (Achtsamkeit = 1; Feedback = 0)
 
 describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE)
 
@@ -981,8 +990,7 @@ library("apaTables")
 cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
 
 # 9 Grand mean centering ----
-    # => noch nicht erfolgreich #### --> M = 0 prüfen 
-
+    
 D_T1LPgmc <- D_T1LP %>%
   mutate(
     gmc_GOALt1 =goalt1- mean(goalt1, na.rm=TRUE),
@@ -993,9 +1001,12 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
+describe(D_T1LPgmc$gmc_GOALt1) # Mittelwert ist Null
+describe(D_T1LPgmc$gmc_MOTt1) # Mittelwert ist Null => grand mean centering hat funktioniert
+
 # 10 ICC berechnen ----
 
-ICCgoal <- ICCbare(SERIAL, TE03_01, AD_ohne_Dropout)
+ICCgoal <- ICCbare(SERIAL, LZ04_01, AD_ohne_Dropout)
 ICCgoal
 ICCse <- ICCbare(SERIAL, SE01_03, AD_ohne_Dropout)
 ICCse
@@ -1012,7 +1023,7 @@ ICCsat
 ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
 ICCpro
 
-# 11 der klägliche Versuch eines HLM ----
+# 11 der klaegliche Versuch eines HLM ----
     # (funzt nicht)
 
 # nach Field
@@ -1087,7 +1098,7 @@ selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  
 
 
 
-# vermutlich FINALE Lösung: ----
+# vermutlich FINALE L?sung HLM: ----
 
 
 # (Zielerreichung => TE03_01;) => die Variable wird gar nicht ausgewertet :D Wir hatten Zielsetzung mit Zielerreichung verwechselt.
@@ -1102,10 +1113,10 @@ selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  
 # Anstrengung => TE08_01 ### KEIN mean centering
 
 
-# neues Subset mit den relevanten Variablen für die Mehrebenenanalyse
+# neues Subset mit den relevanten Variablen fuer die Mehrebenenanalyse
 D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
 
-# zusätzliche csv-Datei mit den gmc-Variablen
+# zusaetzliche csv-Datei mit den gmc-Variablen
 gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
 
 # Zuordnung der gmc-Variablen im Subset D_T1LP_gmx2.0 zu den Seriennummern
@@ -1548,6 +1559,7 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotEff
 
+<<<<<<< HEAD
 # Plot (Tage) für Anstrengung 
 dayEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayEff
@@ -1582,4 +1594,113 @@ Prokrastination.model2 <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random 
 
 anova(Prokrastination.model, Prokrastination.model2) # Modellfit wird schlechter, wenn Interaktion betrachtet wird 
 
+=======
+
+# 12 Deskriptive Betrachtung der Verweildauer der Achtsamkeitsimpulse ----
+
+# TA01 => Faust-Ballen-Thilini (ca. 140s)
+# TA02 => Faust-Ballen-Jakob (ca. 120s)
+# TA03 => Unsere Gedanken (240s)
+# TA04 => Erfahrung beobachten (240s)
+# TA05 => Seated-Mantra-Jakob (ca. 139s)
+# TA06 => Seated-Mantra-Thilini (ca. 180s)
+# TA07 => Bewusstes Atmen (240s)
+# TA08 => OMP-Jakob (ca. 575s)
+# TA09 => OMP-Thilini (ca.440s)
+# TA10 => Wahrnehmung Atem (240s)
+
+# Stichprobengroesse Achtsamkeit => 74
+
+table(Achtsamkeit_ohne_Dropout$QUESTNNR) # Haeufigkeiten, wie oft die jeweiligen Lernplaner ausgefuellt wurden
+table(Achtsamkeit_ohne_Dropout$SERIAL)
+
+# * 12.1 TA01 - Faust-Ballen-Thilini (ca. 140s) ----
+Achtsamkeit_false_TA01 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 140, QUESTNNR == "TA01") 
+# Uebung "Faust-Ballen-Thilini" wurde an insgesamt an 3 Tagen angeboten, Planer 208mal ausgefuellt und davon insgesamt 34 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA01$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA01$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.2 TA02 - Faust-Ballen-Jakob (ca. 120s) ----
+Achtsamkeit_false_TA02 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 120, QUESTNNR == "TA02")
+# Uebung "Faust-Ballen-Jakob" wurde an insgesamt an 2 Tagen angeboten, Planer 142mal ausgefuellt und davon insgesamt 30 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA02$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA02$SERIAL) # insgesamt haben 23 Personen die ?bung einmal ?bersprungen; 7 Personen zweimal
+
+
+# * 12.3 TA03 - Unsere Gedanken (240s) ----
+Achtsamkeit_false_TA03 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA03")
+# Uebung "Unsere Gedanken" wurde an insgesamt an 5 Tagen angeboten, Planer 353mal ausgefuellt und davon insgesamt 47 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA03$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA03$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.4 TA04 - Erfahrung beobachten (240s) ----
+Achtsamkeit_false_TA04 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA04")
+# Uebung "Erfahrung beobachten" wurde an insgesamt an 5 Tagen angeboten, Planer 350mal ausgefuellt und davon insgesamt 46 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA04$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA04$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.5 TA05 - Seated-Mantra-Jakob (ca. 139s) ----
+Achtsamkeit_false_TA05 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 139, QUESTNNR == "TA05")
+# Uebung "Seated-Mantra-Jakob" wurde an insgesamt an 3 Tagen angeboten, Planer 211mal ausgefuellt und davon insgesamt 30 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA05$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA05$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.6 TA06 - Seated-Mantra-Thilini (ca. 180s) ----
+Achtsamkeit_false_TA06 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 180, QUESTNNR == "TA06")
+# Uebung "Seated-Mantra-Thilini" wurde an insgesamt an 2 Tagen angeboten, Planer 145mal ausgefuellt und davon insgesamt 37 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA06$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA06$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.7 TA07 - Bewusstes Atmen (240s) ----
+Achtsamkeit_false_TA07 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA07")
+# Uebung "Bewusstes Atmen" wurde an insgesamt an 6 Tagen angeboten, Planer 414mal ausgefuellt und davon insgesamt 58 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA07$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA07$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.8 TA08 - OMP-Jakob (ca. 575s) ----
+Achtsamkeit_false_TA08 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 575, QUESTNNR == "TA08")
+# Uebung "OMP-Jakob" wurde an insgesamt an 2 Tagen angeboten, Planer 132mal ausgefuellt und davon insgesamt 38 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA08$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA08$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.9 TA09 - OMP-Thilini (ca.440s) ----
+Achtsamkeit_false_TA09 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 440, QUESTNNR == "TA09")
+# Uebung "OMP-Thilini" wurde an insgesamt an 2 Tagen angeboten, Planer 136mal ausgefuellt und davon insgesamt 45 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA09$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA09$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# * 12.10 TA10 - Wahrnehmung Atem (240s) ----
+Achtsamkeit_false_TA10 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA10")
+# Uebung "OMP-Thilini" wurde an insgesamt an 5 Tagen angeboten, Planer 347mal ausgefuellt und davon insgesamt 64 mal die Uebung uebersprungen
+
+Achtsamkeit_false_TA10$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
+
+table(Achtsamkeit_false_TA10$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+>>>>>>> 175e1304732965c248e4ccda8d2d5ba304854efe
 
