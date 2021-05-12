@@ -1013,6 +1013,7 @@ apa.cor.table(cortable, filename = "table.doc", table.number = NA,
     
 D_T1LPgmc <- D_T1LP %>%
   mutate(
+    gmc_LZ04_01 = LZ04_01- mean(LZ04_01, na.rm =TRUE),
     gmc_GOALt1 =goalt1- mean(goalt1, na.rm=TRUE),
     gmc_MOTt1 = mott1-mean(mott1, na.rm=TRUE),
     gmc_VOLt1 = volt1-mean(volt1, na.rm=TRUE),
@@ -1021,6 +1022,12 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
+
+D_T1LPgmc <- D_T1LP_gmc3.0 %>%
+  mutate(
+    gmc_LZ04_01 = LZ04_01- mean(LZ04_01, na.rm =TRUE))
+    
+    
 describe(D_T1LPgmc$gmc_GOALt1) # Mittelwert ist Null
 describe(D_T1LPgmc$gmc_MOTt1) # Mittelwert ist Null => grand mean centering hat funktioniert
 
@@ -1170,6 +1177,10 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 # Auswertung Zielsetzung (LZ04_01)
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
+
+Zielsetzung.model2 <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_LZ04_01, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Zielsetzung.model2)
+
 
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1745,5 +1756,7 @@ Achtsamkeit_false_TA10 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA10$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA10$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
->>>>>>> 175e1304732965c248e4ccda8d2d5ba304854efe
 
+D_T1LP_gmc3.0 <- filter(D_T1LP_gmc2.0, TIME2.0 == "0")
+
+mean(D_T1LP_gmc3.0$LZ04_01, na.rm=TRUE)
