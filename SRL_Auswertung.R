@@ -22,7 +22,7 @@ library(Rmisc)
 library(semTools)
 library(tidyr)
 library(texreg)
-
+library(misty)
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -993,6 +993,7 @@ cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, lan
 
 
 # zweiter Versuch
+
 aggdata_cor <-aggregate(D_T1LP, by =list(D_T1LP$SERIAL),
                     FUN=mean, na.rm=TRUE)
 
@@ -1022,6 +1023,21 @@ D_T1LPgmc <- D_T1LP %>%
 
 describe(D_T1LPgmc$gmc_GOALt1) # Mittelwert ist Null
 describe(D_T1LPgmc$gmc_MOTt1) # Mittelwert ist Null => grand mean centering hat funktioniert
+
+# centering within cluster (CWC, i.e., group-mean centering) => funktioniert nicht
+# https://philippmasur.de/2018/05/23/how-to-center-in-multilevel-models/ 
+
+D_T1LPgmc_Test <- D_T1LP %>% 
+  # Person mean centering (more generally, centering within cluster)
+  group_by(SERIAL) %>% 
+  mutate(GOALt1_cm = mean(goalt1),
+         GOALt1_cwc = goalt1-GOALt1_cm) %>%
+  ungroup %>%
+  # Grand mean centering of the aggregated variable
+  mutate(GOALt1_cmc = GOALt1_cm - mean(GOALt1_cm))
+  
+
+
 
 # 10 ICC berechnen ----
 
