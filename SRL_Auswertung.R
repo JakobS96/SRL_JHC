@@ -1022,11 +1022,25 @@ D_T1LPgmc <- D_T1LP %>%
     gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
     )
 
+D_T1LP_gmc3.0 <- filter(D_T1LP_gmc2.0, TIME2.0 == "0")
+mean(D_T1LP_gmc3.0$LZ04_01, na.rm=TRUE)
 
-D_T1LPgmc <- D_T1LP_gmc3.0 %>%
+
+D_T1LP_gmc3.0 <- D_T1LP_gmc3.0 %>%
   mutate(
-    gmc_LZ04_01 = LZ04_01- mean(LZ04_01, na.rm =TRUE))
-    
+    gmc_LZ04_01 = LZ04_01 - mean(LZ04_01, na.rm = TRUE), # Zielsetzung
+    gmc_PL01_01 = PL01_01 - mean(PL01_01, na.rm = TRUE), # Planung
+    gmc_SM02_02 = SM02_02 - mean(SM02_02, na.rm = TRUE), # intrinsische Motivation
+    gmc_SE01_03 = SE01_03 - mean(SE01_03, na.rm = TRUE), # Selbstwirksamkeit
+    gmc_TE06_01 = TE06_01 - mean(TE06_01, na.rm = TRUE), # Zeitplan
+    gmc_TE10_01 = TE10_01 - mean(TE10_01, na.rm = TRUE), # Zufriedenheit
+    gmc_TE07_01 = TE07_01 - mean(TE07_01, na.rm = TRUE), # Prokrastination
+    gmc_TE08_01 = TE08_01 - mean(TE08_01, na.rm = TRUE)  # Anstrengung
+    )
+
+write.csv2(D_T1LP_gmc3.0, "gmc3.0.csv")
+
+
     
 describe(D_T1LPgmc$gmc_GOALt1) # Mittelwert ist Null
 describe(D_T1LPgmc$gmc_MOTt1) # Mittelwert ist Null => grand mean centering hat funktioniert
@@ -1175,9 +1189,12 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 
 
 # Auswertung Zielsetzung (LZ04_01)
+
+# Modell mit gmc_GOALt1 als Baseline
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
 
+# Modell mit gmc_LZ04_01 als Baseline
 Zielsetzung.model2 <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_LZ04_01, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model2)
 
@@ -1757,6 +1774,5 @@ Achtsamkeit_false_TA10$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen
 
 table(Achtsamkeit_false_TA10$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
 
-D_T1LP_gmc3.0 <- filter(D_T1LP_gmc2.0, TIME2.0 == "0")
 
-mean(D_T1LP_gmc3.0$LZ04_01, na.rm=TRUE)
+
