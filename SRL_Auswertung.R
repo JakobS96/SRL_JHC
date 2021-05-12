@@ -20,7 +20,9 @@ library(reshape)
 library(reshape2)
 library(Rmisc)
 library(semTools)
+library(tidyr)
 library(texreg)
+
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -981,13 +983,30 @@ lme.dscore(CHIMEgesamt,data=D_T1T2_CHIME,type="nlme")
 # 8 Korrelation state und trait Variablen ----
     # => funzt noch nicht
 
-KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_01","TE03_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
+KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_01","LZ04_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
 
-cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_01,TE03_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
+cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_01,LZ04_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
 
 library("apaTables")
 
 cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
+
+
+# zweiter Versuch
+aggdata_cor <-aggregate(D_T1LP, by =list(D_T1LP$SERIAL),
+                    FUN=mean, na.rm=TRUE)
+
+
+
+cor(aggdata_cor[c("SE01_03","SM02_02","LZ04_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")], use = "pairwise")
+
+
+cortable <- aggdata_cor %>% dplyr::select(SE01_03,SM02_02,LZ04_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
+library("apaTables")
+apa.cor.table(cortable, filename = "table.doc", table.number = NA,
+              show.conf.interval = FALSE, landscape = TRUE)
+
+
 
 # 9 Grand mean centering ----
     
@@ -1022,6 +1041,15 @@ ICCsat <- ICCbare(SERIAL, TE10_01, AD_ohne_Dropout)
 ICCsat
 ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
 ICCpro
+
+# Brauchen wir die ICC nicht für den Datensatzt D_T1LP_gmc2.0, mit dem wir auch die Mehrebnenenanalyse gerehcnet haben?
+# und warum für die einzelnen Personen und nicht nur für die Gruppenzugehörigkeit?
+
+ICCgoal_Test <- ICCbare(SERIAL, LZ04_01, D_T1LP_gmc2.0)
+ICCgoal_Test
+
+
+
 
 # 11 der klaegliche Versuch eines HLM ----
     # (funzt nicht)
@@ -1098,7 +1126,7 @@ selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  
 
 
 
-# vermutlich FINALE L?sung HLM: ----
+# vermutlich FINALE Loesung HLM: ----
 
 
 # (Zielerreichung => TE03_01;) => die Variable wird gar nicht ausgewertet :D Wir hatten Zielsetzung mit Zielerreichung verwechselt.
@@ -1127,9 +1155,8 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
 
-
-
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
+
 
 D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, um mit Plots zu rechnen
 
@@ -1182,6 +1209,7 @@ PlotGoalDay <- ggplot(dayGoal, aes(x=TIME2.0, y=LZ04_01, colour=Feedback, group=
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 
 PlotGoalDay
+
 # Auswertung Planung (PL01_01)
 Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
