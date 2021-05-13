@@ -1315,6 +1315,10 @@ PlotPlanDay
 Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
 
+# Modell Motivation mit gmc_SM02_02 als Baseline --> Wird jetzt natuerlich signifikant
+Motivation.model2 <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_SM02_02 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+summary(Motivation.model2)
+
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
 
 line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
