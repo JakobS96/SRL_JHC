@@ -3,6 +3,7 @@
 
 # * 1.1 Laden der Pakete ----
 
+library("apaTables")
 library(car)
 library(dplyr)
 library(EMAtools)
@@ -13,6 +14,7 @@ library(ICC)
 library(lme4)
 library(lavaan)
 library(MBESS)
+library(misty)
 library(nlme)
 library(nortest)
 library(psych)
@@ -22,7 +24,7 @@ library(Rmisc)
 library(semTools)
 library(tidyr)
 library(texreg)
-library(misty)
+
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -32,13 +34,17 @@ Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
 Achtsamkeit_Verweildauer <- read.csv2(file.choose()) # Datei: Daten_Achtsamkeit_Verweildauer
 
+gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
+
+
 # * * 1.2.1 Kodierung fehlender Werte ----
 
 Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
 Achtsamkeit_Verweildauer[Achtsamkeit_Verweildauer == -9 | Achtsamkeit_Verweildauer == -1 | Achtsamkeit_Verweildauer == ""] <- NA
 
-# ** 1.2.2 neue Zusatzvariablen ----
+# * * 1.2.2 neue Zusatzvariablen ----
+
     # 1) Feedback (Feedback = 1; Achtsamkeit = 0)
     # 2) FinishT1 (T1 Fragebogen ausgefuellt = 1; T1 Fragebogen nicht ausgefuellt = 0)
     # 3) FinishT2 (T2 Fragebogen ausgefuellt = 1; T2 Fragebogen nicht ausgefuellt = 0)
@@ -58,6 +64,13 @@ AD <- mutate(AD, dropout = ifelse(FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 
 AD$dropout[is.na(AD$dropout)] <- 1
 
 describeBy(data.frame(AD$Feedback), group = AD$dropout) # 569 Zeilen wurden als Dropout identifiziert.
+
+# Chi^2-Test: Unterschiedlich hoher Dropout zwischen den Gruppen? 
+
+Dropout_nach_Bedingung <- table(AD$dropout, AD$Feedback)
+addmargins(Dropout_nach_Bedingung)
+
+chisq.test(Dropout_nach_Bedingung)
 
 
 # 2 Skalenbildung ---- 
@@ -116,6 +129,7 @@ AD$chime8 <- (AD$FA02_03 + AD$FA02_06 + AD$FA02_15 + AD$FA02_24 + AD$FA02_37)/5
 
 AD$chimeGesamt <- (AD$chime1 + AD$chime2 + AD$chime3 + AD$chime4 + AD$chime5 + AD$chime6 + AD$chime7 + AD$chime8)/8
 
+
 # * 2.4 Skalenbildung Evaluation Lernplaner ----
 
 AD$EVLP <- (AD$EV02_01 + AD$EV02_02+ AD$EV02_03 + AD$EV02_04 + AD$EV02_05 + AD$EV02_06)/6
@@ -124,12 +138,13 @@ AD_ohne_Dropout$EVLP <- (AD_ohne_Dropout$EV02_01 + AD_ohne_Dropout$EV02_02+ AD_o
 
  # relevant ob Dropout oder nicht? Deskriptiv sowieso kaum Unterschiede
 
+
 # * 2.5 Skalenbildung Evaluation Feedback ----
 
 AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_ohne_Dropout$EV04_03 + AD_ohne_Dropout$EV04_04 + AD_ohne_Dropout$EV04_05)/5
 
 
-# 3 Bildung der ben?tigten Subsets ----
+# 3 Bildung der benoetigten Subsets ----
 
 # * 3.1 AD_ohne_Dropout, Achtsamkeit_ohne_Dropout ----
 
@@ -161,6 +176,16 @@ D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
 D_LP <- filter(D_LP, TE16 != 2)
 
 D_T1LP <- rbind(D_T1, D_LP)
+
+table(AD_ohne_Dropout$TE16)
+
+# * 3.7 D_T1LP_gmc2.0 ----
+# fuer die Mehrebenenanalyse
+
+D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
+
+# Zuordnung der gmc-Variablen im Subset D_T1LP_gmx2.0 zu den Seriennummern
+D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 
 
 # 4 Reliabilitaetsanalysen: Berechnung McDonalds Omega ----
@@ -272,7 +297,7 @@ omega(omegaset2)
 omegaChimeT2_1 <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
 omega(omegaChimeT2_1)
 
-# Chime (T2_2) Gewahrsein gegenueber aeu?eren Erfahrungen: alpha = .81; omega = .82
+# Chime (T2_2) Gewahrsein gegenueber aeusseren Erfahrungen: alpha = .81; omega = .82
 omegaChimeT2_2 <- D_T2[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
 omega(omegaChimeT2_2)
 
@@ -314,19 +339,45 @@ omega(omegaChimeT2_Gesamt)
 
 # 5 Deskriptive Analysen ----
 
-# Haeufigkeitsverteilung Geschlecht aufgeteilt nach Bedingung
+# * 5.1 Geschlecht ----
+
+# Haeufigkeit und Anteil aufgeteilt nach Bedingung
 table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback) 
+prop.table(table(AD_ohne_Dropout$DD03, AD_ohne_Dropout$Feedback))
+
+# Haeufigkeit und Anteil gesamt
+table(AD_ohne_Dropout$DD03) 
+prop.table(table(AD_ohne_Dropout$DD03))
+
+
+# * 5.2 Alter ----
 
 # Alter aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
-# vollstaendig ausgefuellte Lernplaner, aufgeteilt nach Bedingung
+# Alter gesamt
+describe(AD_ohne_Dropout$DD02_01) 
+
+# * 5.3 Fachsemester ----
+
+# Haeufigkeit und Anteil gesamt
+table(AD_ohne_Dropout$DD04_01) 
+prop.table(table(AD_ohne_Dropout$DD04_01))
+
+# * 5.4 ausgefuellte Lernplaner ----
+
+# vollstaendig ausgefuellte Lernplaner aufgeteilt nach Bedingung
 describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) 
 table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback)
 
-# Lernplaner nur abends, aufgeteilt nach Bedingung
+# vollstaendig ausgefuellte Lernplaner gesamt
+describe(D_T1$Anzahl_LP_vollstaendig) 
+
+# Lernplaner nur abends aufgeteilt nach Bedingung
 describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) 
 table(D_T1$Anzahl_LP_abends , D_T1$Feedback) 
+
+# * 5.5 Vorwissen ----
 
 # Vorwissen Thema Achtsamkeit, aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
@@ -334,7 +385,8 @@ describeBy(AD_ohne_Dropout$DD10_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 # Vorwissen Thema Feedback, aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
-# Evaluation Feedback 
+# * 5.6 Evaluation Feedback ----
+
 describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.15, SD = 1.08
 
 
@@ -505,6 +557,17 @@ set1_differences # n.s. p = .86
 ci.smd(ncp = 0.17729,
        n.1 = 74, n.2 = 77) # Cohens d = .03
 
+# vollstaendig ausgefuellte Lernplaner
+
+describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE)
+
+LP_vollstaendig <- t.test(D_T1$Anzahl_LP_vollstaendig ~ D_T1$Feedback, var.equal = TRUE)
+LP_vollstaendig
+
+ci.smd(ncp =  0.29203,
+       n.1 = 73, n.2 = 77)
+
+
 # * * 6.2.2 Achtsamkeitsinventar (CHIME) ---- 
 
 # CHIME Subskala 1 
@@ -597,7 +660,7 @@ chime8_differences # n.s. p = .36
 ci.smd(ncp = 0.91834,
        n.1 = 73, n.2 = 77) # Cohens d = .15
 
-# CHIME Gesamt (?ber alle 8 Subskalen hinweg)
+# CHIME Gesamt (ueber alle 8 Subskalen hinweg)
 describeBy(D_T1$chimeGesamt, D_T1$Achtsamkeit, mat = TRUE)
 
 leveneTest(D_T1$chimeGesamt, D_T1$Achtsamkeit.Faktor) # n.s. => Varianzhomogenitaet gegeben
@@ -619,7 +682,9 @@ EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 ci.smd(ncp = -3.5777,
        n.1 = 79, n.2 = 74) # d = -.58 # warum minus d?
 
-# * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 (Ich wuerde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.) ---- 
+# * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 ----
+# (Ich wuerde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.)
+
 describeBy(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
@@ -635,7 +700,8 @@ ci.smd(ncp = -1.4414,
 
 # * 7.1 Trait Variablen ----
 
-# lme fuer Zielsetzung
+
+# lme fuer Zielsetzung ----
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
@@ -653,6 +719,8 @@ anova(baseline_goal, goal)
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
 
 summary(goal) # Warum werden die Koeffizienten fuer Feedback beim summary Befehl nicht signifikant, obwohl der anova Befehl, z.B. anova(goal) signifikante Ergebnisse anzeigt?
+
+# Plot fuer Zielsetzung
 
 # erster Versuch Mittelwerte graphisch darzustellen
 plot_GOAL <- error.bars.by(data.frame(D_T1T2$goalt1, D_T1T2$goalt2), D_T1T2$Feedback,
@@ -708,6 +776,7 @@ motorbar <- motorbar + theme(
   legend.title = element_text(size=14, face="bold"))
 motorbar
 
+
 # lme fuer Selbstmotivierung
 
 aggdata_long_MOT <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("mott1", "mott2"), variable.name="TIME",value.name="MOT", na.rm = TRUE)
@@ -736,6 +805,7 @@ plot_GOAL <- error.bars.by(data.frame(D_T1T2$mott1, D_T1T2$mott2), D_T1T2$Feedba
                            main = "Selbst-Motivation Prä-Post",
                            family(serif),
 )
+
 
 # lme fuer Volition
 
@@ -853,12 +923,12 @@ summary(se)
 D_T1T2_CHIME <- D_T1T2 
 D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
 
-# lme fuer CHIME Subskala 1 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 1 
 
-describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME1 <- lme(chime1~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME1 <- lme(chime1~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime1)
 anova(CHIME1) # Achtsamkeit signifikant ( p = .0124, d = -.19)
@@ -867,12 +937,12 @@ anova(baseline_chime1, CHIME1)
 lme.dscore(CHIME1,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 2 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 2 
 
-describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime2 <- lme(chime2 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME2 <- lme(chime2~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime2 <- lme(chime2 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME2 <- lme(chime2~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime2)
 anova(CHIME2) 
@@ -881,12 +951,12 @@ anova(baseline_chime2, CHIME2)
 lme.dscore(CHIME2,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 3 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 3 
 
-describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime3 <- lme(chime3 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME3 <- lme(chime3~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime3 <- lme(chime3 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME3 <- lme(chime3~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime3)
 anova(CHIME3) 
@@ -895,12 +965,12 @@ anova(baseline_chime3, CHIME3)
 lme.dscore(CHIME3,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 4 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 4 
 
-describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime4 <- lme(chime4 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME4 <- lme(chime4~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime4 <- lme(chime4 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME4 <- lme(chime4~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime4)
 anova(CHIME4) 
@@ -909,12 +979,12 @@ anova(baseline_chime4, CHIME4)
 lme.dscore(CHIME4,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 5 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 5 
 
-describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME5 <- lme(chime5~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME5 <- lme(chime5~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime5)
 anova(CHIME5) # TIME signifikant (p = .0003, d = .54) 
@@ -923,12 +993,12 @@ anova(baseline_chime5, CHIME5)
 lme.dscore(CHIME5,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 6 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 6 
 
-describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME6 <- lme(chime6~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME6 <- lme(chime6~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime6)
 anova(CHIME6) # Achtsamkeit signifikant (p = .0013, d = .40)
@@ -937,12 +1007,12 @@ anova(baseline_chime6, CHIME6)
 lme.dscore(CHIME6,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 7 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 7 
 
-describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime7 <- lme(chime7 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME7 <- lme(chime7~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime7 <- lme(chime7 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME7 <- lme(chime7~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime7)
 anova(CHIME7) 
@@ -951,12 +1021,12 @@ anova(baseline_chime7, CHIME7)
 lme.dscore(CHIME7,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Subskala 8 (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Subskala 8 
 
-describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
 
-baseline_chime8 <- lme(chime8 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIME8 <- lme(chime8~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chime8 <- lme(chime8 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIME8 <- lme(chime8~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime8)
 anova(CHIME8) 
@@ -965,12 +1035,12 @@ anova(baseline_chime8, CHIME8)
 lme.dscore(CHIME8,data=D_T1T2_CHIME,type="nlme")
 
 
-# lme fuer CHIME Gesamt (Achtsamkeit = 1; Feedback = 0)
+# lme fuer CHIME Gesamt 
 
-describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE)
+describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE)
 
-baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
-CHIMEgesamt <- lme(chimeGesamt~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
+baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+CHIMEgesamt <- lme(chimeGesamt~TIME*Feedback, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chimeGesamt)
 anova(CHIMEgesamt) # TIME signifikant (p = .0265, d = .16)
@@ -979,34 +1049,19 @@ anova(baseline_chimeGesamt, CHIMEgesamt)
 lme.dscore(CHIMEgesamt,data=D_T1T2_CHIME,type="nlme")
 
 
-
 # 8 Korrelation state und trait Variablen ----
-    # => funzt noch nicht
-
-KorrelationT1undLP <- cor(AD_ohne_Dropout[c("SE01_03","SM02_01","LZ04_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")])
-
-cortable <- KorrelationT1undLP %>% dplyr::select(SE01_03,SM02_01,LZ04_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
-
-library("apaTables")
-
-cortab <- apa.cor.table(cortable, filename = "table.doc", table.number = NA, landscape = TRUE)
-
-
-# zweiter Versuch
 
 aggdata_cor <-aggregate(D_T1LP, by =list(D_T1LP$SERIAL),
                     FUN=mean, na.rm=TRUE)
-
 
 
 cor(aggdata_cor[c("SE01_03","SM02_02","LZ04_01","PL01_01","TE08_01","TE06_01","TE10_01","TE07_01","reft1","plant1","volt1","mott1","goalt1", "set1", "prot1")], use = "pairwise")
 
 
 cortable <- aggdata_cor %>% dplyr::select(SE01_03,SM02_02,LZ04_01,PL01_01,TE08_01,TE06_01,TE10_01,TE07_01,reft1,plant1,volt1,mott1,goalt1, set1, prot1)
-library("apaTables")
+
 apa.cor.table(cortable, filename = "table.doc", table.number = NA,
               show.conf.interval = FALSE, landscape = TRUE)
-
 
 
 # 9 Grand mean centering ----
@@ -1041,25 +1096,6 @@ D_T1LP_gmc3.0 <- D_T1LP_gmc3.0 %>%
 write.csv2(D_T1LP_gmc3.0, "gmc3.0.csv")
 
 
-    
-describe(D_T1LPgmc$gmc_GOALt1) # Mittelwert ist Null
-describe(D_T1LPgmc$gmc_MOTt1) # Mittelwert ist Null => grand mean centering hat funktioniert
-
-# centering within cluster (CWC, i.e., group-mean centering) => funktioniert nicht
-# https://philippmasur.de/2018/05/23/how-to-center-in-multilevel-models/ 
-
-D_T1LPgmc_Test <- D_T1LP %>% 
-  # Person mean centering (more generally, centering within cluster)
-  group_by(SERIAL) %>% 
-  mutate(GOALt1_cm = mean(goalt1),
-         GOALt1_cwc = goalt1-GOALt1_cm) %>%
-  ungroup %>%
-  # Grand mean centering of the aggregated variable
-  mutate(GOALt1_cmc = GOALt1_cm - mean(GOALt1_cm))
-  
-
-
-
 # 10 ICC berechnen ----
 
 ICCgoal <- ICCbare(SERIAL, LZ04_01, AD_ohne_Dropout)
@@ -1086,87 +1122,7 @@ ICCgoal_Test <- ICCbare(SERIAL, LZ04_01, D_T1LP_gmc2.0)
 ICCgoal_Test
 
 
-
-
-# 11 der klaegliche Versuch eines HLM ----
-    # (funzt nicht)
-
-# nach Field
-
-
-intercept <-gls(TE03_01 ~ 1, data = D_T1LPgmc, method = "ML", na.action = na.exclude)
-
-summary(intercept)
-
-randomIntercept <-lme(TE03_01 ~ 1, data = D_T1LPgmc, random = ~1|SERIAL, method = "ML", na.action = na.exclude, control = list(opt="optim"))
-
-summary(randomIntercept)
-
-timeRI<-update(randomIntercept, .~. + DAYS)
-
-summary(timeRI)
-
-timeRS<-update(timeRI, random = ~Feedback +DAYS|SERIAL)
-
-summary(timeRS)
-
-ARModel<-update(timeRS, correlation = corAR1()) # kann hier keine Autokorrelation definieren
-
-anova(intercept, randomIntercept, timeRI, timeRS, ARModel)
-
-summary(ARModel); 
-intervals(ARModel) 
-
-
-# Wenn man DAYS zu character transformiert und damit rechnet (DAYSchar), kommen dieselben Ergebnisse wie für TIME raus
-
-D_T1LPgmc$DAYSchar <- as.character(D_T1LPgmc$DAYS) 
-
-
-## TIME statt DAYS (test-Rechnung)
-
-timeRI2<-update(randomIntercept, .~. + TIME) 
-
-summary(timeRI2)
-
-timeRS2<-update(timeRI2, random = ~Feedback +TIME|SERIAL) # Mit TIME und dem D_T1LPgmc Datensatz funktioniert es ab hier nicht mehr
-
-summary(timeRS2)
-
-
-# braucht man einen aggregierten Datensatz oder können wir einfach mit D_T1LPgmc rechnen? z. B.:
-
-HLMdata_GOAL <- melt(D_T1LPgmc,id.vars=c("SERIAL", "Feedback"), measure.vars=c("TE03_01", "gmc_GOALt1"), variable.name="TIME",value.name="GOAL", na.rm = TRUE) 
-
-
-### Neuer Versuch mit lme4 Paket und lmer Funktion
-
-modell.1 <- lmer(TE03_01 ~ 1 + (1|Feedback), data = D_T1LPgmc)
-summary(modell.1)
-
-0.04914/(0.04914+1.60414) # ICC
-
-modell.2 <- lmer(TE03_01 ~ SERIAL+(1|Feedback), data = D_T1LPgmc)
-summary(modell.2)
-
-# nach Theobald
-
-D_T1LPgmc$gmc_GOALt1fac <- factor(D_T1LPgmc$gmc_GOALt1) ### random Ausprobiern, weil die Fehlermeldung sagt die factors haben nicht 2 Level (SERIAL hat z. B. nur 1 level und die anderen sind keine factors)
-D_T1LPgmc$TIMEfac <- factor(D_T1LPgmc$TIME)
-D_T1LPgmc$SERIALfac <- factor(D_T1LPgmc$SERIAL)
-D_T1LPgmc$Feedbackfac <- factor(D_T1LPgmc$Feedback)
-D_T1LPgmc$TE03_01fac <- factor(D_T1LPgmc$TE03_01) ## Im Zweifel löschen
-
-goalsetting_feedback <-lme(TE03_01 ~ Feedback+ gmc_GOALt1 ,  correlation = corAR1(),  random = ~ 1 + Feedback +DAYSchar | SERIAL, data = D_T1LPgmc, na.action=na.omit, method='ML')
-
-selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  , random = ~ 1 + Feedback + days | idnr, data=data, na.action=na.omit, method='ML')
-
-
-
-# vermutlich FINALE Loesung HLM: ----
-
-
-# (Zielerreichung => TE03_01;) => die Variable wird gar nicht ausgewertet :D Wir hatten Zielsetzung mit Zielerreichung verwechselt.
+# 11 Finale Loesung HLM: ----
 
 # Zielsetzung (anspruchsvoll) => LZ04_01; ### gmc_GOALt1
 # Planung => PL01_01; ### gmc_PLANt1
@@ -1177,18 +1133,9 @@ selfefficacy_feedback <-lme(TASE ~ Feedback+ gmc_SEt1 , correlation = corAR1()  
 # Prokrastination => TE07_01; ### gmc_PROt1
 # Anstrengung => TE08_01 ### KEIN mean centering
 
+D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, um mit Plots zu rechnen
 
-# neues Subset mit den relevanten Variablen fuer die Mehrebenenanalyse
-D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
-
-# zusaetzliche csv-Datei mit den gmc-Variablen
-gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
-
-# Zuordnung der gmc-Variablen im Subset D_T1LP_gmx2.0 zu den Seriennummern
-D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
-
-
-# Auswertung Zielsetzung (LZ04_01)
+# * 11.1 Zielsetzung (LZ04_01) ----
 
 # Modell mit gmc_GOALt1 als Baseline
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1198,17 +1145,15 @@ summary(Zielsetzung.model)
 Zielsetzung.model2 <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_LZ04_01, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model2)
 
-
+# Effektstaerke d
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
 
-D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, um mit Plots zu rechnen
-
 line1 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, LZ04_01, colour = Feedback))
-
 line1 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zielsetzung", colour = "Feedback")
 
-# Plot Zielsetzung
+
+# * * 11.1.1 Plot Wochenverlauf_Zielsetzung ----
 
 SummGoal <- summarySE(D_T1LP_gmc2.0, measurevar="LZ04_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummGoal
@@ -1230,7 +1175,10 @@ PlotGoal <- ggplot(SummGoal, aes(x=WEEK, y=LZ04_01, colour=Feedback, group=Feedb
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotGoal
+
+# * * 11.1.2 Plot Tagesverlauf_Zielsetzung ----
 
 dayGoal <- summarySE(D_T1LP_gmc2.0, measurevar="LZ04_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayGoal
@@ -1254,17 +1202,20 @@ PlotGoalDay <- ggplot(dayGoal, aes(x=TIME2.0, y=LZ04_01, colour=Feedback, group=
 
 PlotGoalDay
 
-# Auswertung Planung (PL01_01)
+# * 11.2 Planung (PL01_01) ----
+
 Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
+# Effektstaerke
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
 
+line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
 line2 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Planung", colour = "Feedback")
 
-# Plot Planung
+
+# * * 11.2.1 Plot Wochenverlauf_Planung ----
 
 SummPlan <- summarySE(D_T1LP_gmc2.0, measurevar="PL01_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummPlan
@@ -1288,7 +1239,8 @@ PlotPlan <- ggplot(SummPlan, aes(x=WEEK, y=PL01_01, colour=Feedback, group=Feedb
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 PlotPlan
 
-# Plot (Tage) für Planung
+# * * 11.2.2 Plot Tagesverlauf_Planung ----
+
 dayPlan <- summarySE(D_T1LP_gmc2.0, measurevar="PL01_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayPlan
 
@@ -1311,7 +1263,9 @@ PlotPlanDay <- ggplot(dayPlan, aes(x=TIME2.0, y=PL01_01, colour=Feedback, group=
 
 PlotPlanDay
 
-# Auswertung intrinsische Motivation (SM02_02)
+
+# * 11.3 intrinsische Motivation (SM02_02) ----
+
 Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
 
@@ -1319,13 +1273,15 @@ summary(Motivation.model)
 Motivation.model2 <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_SM02_02 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model2)
 
+# Effektstaerke
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
 
+line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
 line3 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Motivation", colour = "Feedback")
 
-# Plot intrinsische Motivation
+
+# * * 11.3.1 Plot Wochenverlauf_intrinsische Motivation ----
 
 SummMot <- summarySE(D_T1LP_gmc2.0, measurevar="SM02_02", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummMot
@@ -1347,9 +1303,10 @@ PlotMot <- ggplot(SummMot, aes(x=WEEK, y=SM02_02, colour=Feedback, group=Feedbac
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotMot
 
-# Plot (Tage) für Motivation
+# * * 11.3.2 Plot Tagesverlauf_intrinsische Motivation ----
 
 dayMot <- summarySE(D_T1LP_gmc2.0, measurevar="SM02_02", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayMot
@@ -1372,17 +1329,22 @@ PlotMotDay <- ggplot(dayMot, aes(x=TIME2.0, y=SM02_02, colour=Feedback, group=Fe
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 
 PlotMotDay
-# Selbstwirksamkeit (SE01_03)
+
+
+# * 11.4 Selbstwirksamkeit (SE01_03) ----
+
 Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
+# Effektstaerke
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
 
+line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
 line4 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Selbstwirksamkeit", colour = "Feedback")
 
-# Plot Selbstwirksamkeit
+
+# * * 11.4.1 Plot Wochenverlauf_Selbstwirksamkeit ----
 
 SummSe <- summarySE(D_T1LP_gmc2.0, measurevar="SE01_03", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummSe
@@ -1404,9 +1366,11 @@ PlotSe <- ggplot(SummSe, aes(x=WEEK, y=SE01_03, colour=Feedback, group=Feedback)
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotSe
 
-# Plot (Tage) für Selbstwirksamkeit
+# * * 11.4.2 Plot Tagesverlauf_Selbstwirksamkeit ----
+
 daySe <- summarySE(D_T1LP_gmc2.0, measurevar="SE01_03", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 daySe
 
@@ -1428,17 +1392,22 @@ PlotSeDay <- ggplot(daySe, aes(x=TIME2.0, y=SE01_03, colour=Feedback, group=Feed
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
 
 PlotSeDay
-# Zeitplan (TE06_01)
+
+
+# * 11.5 Zeitplan (TE06_01) ----
+
 Zeitplan.model <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
 
+# Effektstaerke
 lme.dscore(Zeitplan.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line5 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE06_01, colour = Feedback))
 
+line5 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE06_01, colour = Feedback))
 line5 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zeitplanung", colour = "Feedback")
 
-# Plot Zeitplan
+
+# * * 11.5.1 Plot Wochenverlauf_Zeitplan ----
 
 SummTime <- summarySE(D_T1LP_gmc2.0, measurevar="TE06_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummTime
@@ -1460,9 +1429,11 @@ PlotTime <- ggplot(SummTime, aes(x=WEEK, y=TE06_01, colour=Feedback, group=Feedb
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotTime
 
-# Plot (Tage) für Zeitplanung
+# * * 11.5.2 Plot Tagesverlauf_Zeitplan ----
+
 dayTime <- summarySE(D_T1LP_gmc2.0, measurevar="TE06_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayTime
 
@@ -1485,17 +1456,21 @@ PlotTimeDay <- ggplot(dayTime, aes(x=TIME2.0, y=TE06_01, colour=Feedback, group=
 
 PlotTimeDay
 
-# Zufriedenheit (TE10_01)
+
+# * 11.6 Zufriedenheit (TE10_01) ----
+
 Zufriedenheit.model <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
+# Effektstaerke
 lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line6 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE10_01, colour = Feedback))
 
+line6 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE10_01, colour = Feedback))
 line6 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zufriedenheit", colour = "Feedback")
 
-# Plot Zufriedenheit
+
+# * * 11.6.1 Plot Wochenverlauf_Zufriedenheit ----
 
 SummSat <- summarySE(D_T1LP_gmc2.0, measurevar="TE10_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummSat
@@ -1517,9 +1492,11 @@ PlotSat <- ggplot(SummSat, aes(x=WEEK, y=TE10_01, colour=Feedback, group=Feedbac
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotSat
 
-# Plot (Tage) für Zufriedenheit
+# * * 11.6.2 Plot Tagesverlauf_Zufriedenheit ----
+
 daySat <- summarySE(D_T1LP_gmc2.0, measurevar="TE10_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 daySat
 
@@ -1542,17 +1519,21 @@ PlotSatDay <- ggplot(daySat, aes(x=TIME2.0, y=TE10_01, colour=Feedback, group=Fe
 
 PlotSatDay
 
-# Prokrastination (TE07_01)
+
+# * 11.7 Prokrastination (TE07_01) ----
+
 Prokrastination.model <- lme(TE07_01 ~ Feedback* TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
 
+# Effektstaerke
 lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
 
+line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
 line7 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Prokrastination", colour = "Feedback")
 
-# Plot Prokrastination
+
+# * * 11.7.1 Plot Wochenverlauf_Prokrastination ----
 
 SummPro <- summarySE(D_T1LP_gmc2.0, measurevar="TE07_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummPro
@@ -1574,9 +1555,11 @@ PlotPro <- ggplot(SummPro, aes(x=WEEK, y=TE07_01, colour=Feedback, group=Feedbac
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotPro
 
-# Plot (Tage) für Prokrastination
+# * * 11.7.2 Plot Tagesverlauf_Prokrastination ----
+
 dayPro <- summarySE(D_T1LP_gmc2.0, measurevar="TE07_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayPro
 
@@ -1599,19 +1582,23 @@ PlotProDay <- ggplot(dayPro, aes(x=TIME2.0, y=TE07_01, colour=Feedback, group=Fe
 
 PlotProDay
 
-# Anstrengung (TE08_01)
+
+# * 11.8 Anstrengung/ Lernaufwand (TE08_01) ----
+
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 Anstrengung.model <- lme(TE08_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
+# Effektstaerke
 lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
 
-line8 <- ggplot(tgc, aes(WEEK, TE08_01, colour = Feedback))
 
+line8 <- ggplot(tgc, aes(WEEK, TE08_01, colour = Feedback))
 line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
 
-# Plot Anstrengung 
+
+# * * 11.8.1 Plot Wochenverlauf_Anstrengung/ Lernaufwand ---- 
 
 SummEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
 SummEff
@@ -1633,9 +1620,11 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
   theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+
 PlotEff
 
-# Plot (Tage) für Anstrengung 
+# * * 11.8.2 Plot Tagesverlauf_Anstrengung/ Lenraufwand ---- 
+
 dayEff <- summarySE(D_T1LP_gmc2.0, measurevar="TE08_01", groupvars=c("Feedback","TIME2.0"), na.rm = TRUE)
 dayEff
 
