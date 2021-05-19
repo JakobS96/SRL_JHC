@@ -3,7 +3,7 @@
 
 # * 1.1 Laden der Pakete ----
 
-library("apaTables")
+library(apaTables)
 library(car)
 library(dplyr)
 library(EMAtools)
@@ -36,6 +36,7 @@ Achtsamkeit_Verweildauer <- read.csv2(file.choose()) # Datei: Daten_Achtsamkeit_
 
 gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
 
+D_T1T3_final <- read.csv2(file.choose()) # Datei: D_T1T3_final
 
 # * * 1.2.1 Kodierung fehlender Werte ----
 
@@ -160,7 +161,11 @@ D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
 
 D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
 
-# * 3.4 T1 & T2 ----
+# * 3.4 T3 ----
+
+D_T3 <- subset(AD_ohne_Dropout, TIME=="T3")
+
+# * 3.5 T1 & T2 ----
 
 D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
 D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
@@ -179,7 +184,13 @@ D_T1LP <- rbind(D_T1, D_LP)
 
 table(AD_ohne_Dropout$TE16)
 
-# * 3.7 D_T1LP_gmc2.0 ----
+# * 3.7 T1 & T3 => D_T1T3
+
+D_T1T3 <- rbind(D_T1, D_T3) 
+
+write.csv2(D_T1T3, "D_T1T3.csv")
+
+# * 3.8 D_T1LP_gmc2.0 ----
 # fuer die Mehrebenenanalyse
 
 D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
@@ -1137,13 +1148,8 @@ D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, 
 
 # * 11.1 Zielsetzung (LZ04_01) ----
 
-# Modell mit gmc_GOALt1 als Baseline
-Zielsetzung.model <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zielsetzung.model <- lme(LZ04_01 ~ Feedback + TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
-
-# Modell mit gmc_LZ04_01 als Baseline
-Zielsetzung.model2 <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_LZ04_01, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
-summary(Zielsetzung.model2)
 
 # Effektstaerke d
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1204,7 +1210,7 @@ PlotGoalDay
 
 # * 11.2 Planung (PL01_01) ----
 
-Planung.model <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Planung.model <- lme(PL01_01 ~ Feedback + TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
 # Effektstaerke
@@ -1266,12 +1272,8 @@ PlotPlanDay
 
 # * 11.3 intrinsische Motivation (SM02_02) ----
 
-Motivation.model <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Motivation.model <- lme(SM02_02 ~ Feedback + TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
-
-# Modell Motivation mit gmc_SM02_02 als Baseline --> Wird jetzt natuerlich signifikant
-Motivation.model2 <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_SM02_02 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
-summary(Motivation.model2)
 
 # Effektstaerke
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1333,7 +1335,7 @@ PlotMotDay
 
 # * 11.4 Selbstwirksamkeit (SE01_03) ----
 
-Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
 # Effektstaerke
@@ -1396,7 +1398,7 @@ PlotSeDay
 
 # * 11.5 Zeitplan (TE06_01) ----
 
-Zeitplan.model <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zeitplan.model <- lme(TE06_01 ~ Feedback + TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
 
 # Effektstaerke
@@ -1459,7 +1461,7 @@ PlotTimeDay
 
 # * 11.6 Zufriedenheit (TE10_01) ----
 
-Zufriedenheit.model <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zufriedenheit.model <- lme(TE10_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
 # Effektstaerke
@@ -1522,7 +1524,7 @@ PlotSatDay
 
 # * 11.7 Prokrastination (TE07_01) ----
 
-Prokrastination.model <- lme(TE07_01 ~ Feedback* TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Prokrastination.model <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
 
 # Effektstaerke
@@ -1587,7 +1589,7 @@ PlotProDay
 
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-Anstrengung.model <- lme(TE08_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Anstrengung.model <- lme(TE08_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
 # Effektstaerke
@@ -1766,6 +1768,102 @@ Achtsamkeit_false_TA10 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA10$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA10$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
+
+
+# 13 Auswertung T3 ----
+
+# * 13.1 Zufriedenheit mit den Noten ----
+
+table(D_T3$Feedback)
+
+# Angaben Datum Prüfung 1
+table(D_T3$LP02_01)
+
+# Angaben Datum Prüfung 2
+table(D_T3$LP06_01)
+
+# Angaben Datum Prüfung 3
+table(D_T3$LP10_01)
+
+## Angaben wie oft, welches Prüfungsdatum angegeben wurde, schwer zu interpretieren ... 
+# Viele Personen haben mehrmals das gleiche Datum angegeben, anstatt die Felder einfach frei zu lassen.
+
+# Zufriedenheit mit Note 1
+describeBy(D_T3$PT03_01, D_T3$Feedback, mat = TRUE)
+
+# Zufriedenheit mit Note 2
+describeBy(D_T3$PT05_01, D_T3$Feedback, mat = TRUE)
+
+# Zufriedenheit mit Note 3
+describeBy(D_T3$PT07_01, D_T3$Feedback, mat = TRUE)
+
+# Zufriedenheit mit Note gesamt
+D_T3$ZufN_gesamt <- (D_T3$PT03_01 + D_T3$PT05_01 + D_T3$PT07_01)/ 3 # neue Variable: alle drei Noten zusammengerechnet & gemittelt
+
+describeBy(D_T3$ZufN_gesamt, D_T3$Feedback, mat = TRUE)
+
+leveneTest(D_T3$ZufN_gesamt, D_T3$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
+
+ZufN_gesamt_differences <- t.test(D_T3$ZufN_gesamt ~ D_T3$Feedback, var.equal = TRUE)
+ZufN_gesamt_differences # n.s. p = .730
+
+ci.smd(ncp = 0.34638,
+       n.1 = 45, n.2 = 69) # Cohens d = .07 
+
+# * 13.2 erwartete vs. finale Noten ----
+
+D_T1T3_final_2 <- D_T1T3_final %>% group_by(SERIAL) %>% filter(n()>1) # nur die Personen, die T1 & T3 ausgefüllt haben
+
+table(D_T1T3_final_2$TIME == "T3", D_T1T3_final_2$Feedback)
+
+addmargins(table(D_T1T3_final_2$TIME == "T3", D_T1T3_final_2$Feedback)) # 120 Personen haben T1 & T3 ausgefüllt
+
+# erwartete Note 1
+describeBy(D_T1T3_final_2$LP05, D_T1T3_final_2$Feedback, mat = TRUE)
+# finale Note 1
+describeBy(D_T1T3_final_2$PT02, D_T1T3_final_2$Feedback, mat = TRUE)
+
+
+# erwartete Note 2
+describeBy(D_T1T3_final_2$LP09, D_T1T3_final_2$Feedback, mat = TRUE)
+# tatsächliche Note 2
+describeBy(D_T1T3_final_2$PT04, D_T1T3_final_2$Feedback, mat = TRUE)
+
+
+# erwartete Note 3
+describeBy(D_T1T3_final_2$LP13, D_T1T3_final_2$Feedback, mat = TRUE)
+# tatsächliche Note 3
+describeBy(D_T1T3_final_2$PT06, D_T1T3_final_2$Feedback, mat = TRUE)
+
+# erwartete Noten gesamt
+D_T1T3_final_2$erwN_gesamt <- (D_T1T3_final_2$LP05 + D_T1T3_final_2$LP09 + D_T1T3_final_2$LP13)/ 3
+
+describeBy(D_T1T3_final_2$erwN_gesamt, D_T1T3_final_2$Feedback, mat = TRUE)
+
+# tatsächliche Noten gesamt
+D_T1T3_final_2$tatsN_gesamt <- (D_T1T3_final_2$PT02 + D_T1T3_final_2$PT04 + D_T1T3_final_2$PT06)/ 3
+
+describeBy(D_T1T3_final_2$tatsN_gesamt, D_T1T3_final_2$Feedback, mat = TRUE)
+
+
+leveneTest(D_T1T3_final_2$tatsN_gesamt, D_T1T3_final_2$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
+
+tatsN_gesamt_differences <- t.test(D_T1T3_final_2$tatsN_gesamt ~ D_T1T3_final_2$Feedback, var.equal = TRUE)
+tatsN_gesamt_differences # n.s. p = .394
+
+ci.smd(ncp = -0.85512,
+       n.1 = 45, n.2 = 68) # Cohens d = -.16 
+
+
+
+## Problem: Berechnung der neuen Variablen für die DIfferenz zwischen erwarteter und tatsächlich Note klappt nicht
+## vmtl. müssten Daten dafür im Wide-Format vorliegen.
+## Die Transformation ist mir bisher aber nicht gelungen. 
+
+## vmtl. müsste man auch irgendwie noch ablgleichen, ob die Leute bei T1 & T3 auch die gleichen Prüfungen 1, 2 & 3 angegeben haben?!
+## Sonst berechnet man ja Differenzwerte, die gar nicht zusammengehören, weil es sich um unterschiedliche Prüfungen handelt?!
+
+
 
 
 
