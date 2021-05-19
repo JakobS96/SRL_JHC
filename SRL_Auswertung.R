@@ -168,7 +168,11 @@ D_T3 <- subset(AD_ohne_Dropout, TIME=="T3")
 # * 3.5 T1 & T2 ----
 
 D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
-D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544")
+D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544", SERIAL != "ZV438183")
+
+table(D_T1T2$TIME, D_T1T2$Feedback)
+
+table(AD_ohne_Dropout$TIME, AD_ohne_Dropout$Feedback)
 
 # * 3.5 T1 & T2 => CHIME ----
 
@@ -712,7 +716,7 @@ ci.smd(ncp = -1.4414,
 # * 7.1 Trait Variablen ----
 
 
-# lme fuer Zielsetzung ----
+# lme fuer Zielsetzung 
 
 aggdata_long_GOAL <- melt(D_T1T2,id.vars=c("SERIAL", "Feedback"), measure.vars=c("goalt1", "goalt2"), variable.name="TIME",value.name="GOAL", na.rm = TRUE)
 
