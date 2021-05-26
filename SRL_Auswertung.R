@@ -1155,10 +1155,6 @@ summary(Zielsetzung.model)
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
 
 
-line1 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, LZ04_01, colour = Feedback))
-line1 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zielsetzung", colour = "Feedback")
-
-
 # * * 11.1.1 Plot Wochenverlauf_Zielsetzung ----
 
 SummGoal <- summarySE(D_T1LP_gmc2.0, measurevar="LZ04_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
@@ -1217,10 +1213,6 @@ summary(Planung.model)
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
 
 
-line2 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, PL01_01, colour = Feedback))
-line2 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Planung", colour = "Feedback")
-
-
 # * * 11.2.1 Plot Wochenverlauf_Planung ----
 
 SummPlan <- summarySE(D_T1LP_gmc2.0, measurevar="PL01_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
@@ -1277,10 +1269,6 @@ summary(Motivation.model)
 
 # Effektstaerke
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
-
-
-line3 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SM02_02, colour = Feedback))
-line3 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Motivation", colour = "Feedback")
 
 
 # * * 11.3.1 Plot Wochenverlauf_intrinsische Motivation ----
@@ -1342,10 +1330,6 @@ summary(Selbstwirksamkeit.model)
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
 
 
-line4 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, SE01_03, colour = Feedback))
-line4 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Selbstwirksamkeit", colour = "Feedback")
-
-
 # * * 11.4.1 Plot Wochenverlauf_Selbstwirksamkeit ----
 
 SummSe <- summarySE(D_T1LP_gmc2.0, measurevar="SE01_03", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
@@ -1403,10 +1387,6 @@ summary(Zeitplan.model)
 
 # Effektstaerke
 lme.dscore(Zeitplan.model,data=D_T1LP_gmc2.0,type="nlme")
-
-
-line5 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE06_01, colour = Feedback))
-line5 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zeitplanung", colour = "Feedback")
 
 
 # * * 11.5.1 Plot Wochenverlauf_Zeitplan ----
@@ -1468,10 +1448,6 @@ summary(Zufriedenheit.model)
 lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
 
 
-line6 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE10_01, colour = Feedback))
-line6 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Zufriedenheit", colour = "Feedback")
-
-
 # * * 11.6.1 Plot Wochenverlauf_Zufriedenheit ----
 
 SummSat <- summarySE(D_T1LP_gmc2.0, measurevar="TE10_01", groupvars=c("Feedback","WEEK"), na.rm = TRUE)
@@ -1529,10 +1505,6 @@ summary(Prokrastination.model)
 
 # Effektstaerke
 lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
-
-
-line7 <- ggplot(D_T1LP_gmc2.0, aes(WEEK, TE07_01, colour = Feedback))
-line7 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Prokrastination", colour = "Feedback")
 
 
 # * * 11.7.1 Plot Wochenverlauf_Prokrastination ----
@@ -1594,10 +1566,6 @@ summary(Anstrengung.model)
 
 # Effektstaerke
 lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
-
-
-line8 <- ggplot(tgc, aes(WEEK, TE08_01, colour = Feedback))
-line8 + stat_summary(fun.y = mean, geom = "point") + stat_summary(fun.y = mean, geom = "line", aes(group = Feedback)) + stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.2) + labs(x = "Wochen", y = "Anstrengung", colour = "Feedback")
 
 
 # * * 11.8.1 Plot Wochenverlauf_Anstrengung/ Lernaufwand ---- 
