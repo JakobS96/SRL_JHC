@@ -149,7 +149,7 @@ AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_
 
 # * 3.1 AD_ohne_Dropout, Achtsamkeit_ohne_Dropout ----
 
-AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
+AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA" & SERIAL != "DZ883544", SERIAL != "ZV438183") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
 Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA")
 
@@ -167,8 +167,7 @@ D_T3 <- subset(AD_ohne_Dropout, TIME=="T3")
 
 # * 3.5 T1 & T2 ----
 
-D_T1T2 <- rbind(D_T1, D_T2) # DZ883544 muss raus gefiltert werden, da im T2 Fragebogen nicht konzentriert 
-D_T1T2 <- filter(D_T1T2, SERIAL != "DZ883544", SERIAL != "ZV438183")
+D_T1T2 <- rbind(D_T1, D_T2) 
 
 table(D_T1T2$TIME, D_T1T2$Feedback)
 
