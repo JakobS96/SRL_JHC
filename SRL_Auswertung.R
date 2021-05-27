@@ -191,7 +191,6 @@ table(AD_ohne_Dropout$TE16)
 
 D_T1T3 <- rbind(D_T1, D_T3) 
 
-write.csv2(D_T1T3, "D_T1T3.csv")
 
 # * 3.8 D_T1LP_gmc2.0 ----
 # fuer die Mehrebenenanalyse
