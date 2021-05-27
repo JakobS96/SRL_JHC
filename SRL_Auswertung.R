@@ -151,7 +151,7 @@ AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_
 
 AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA" & SERIAL != "DZ883544", SERIAL != "ZV438183") # Es werden 574 Fälle raus gefiltert (5x SERIAL = NA)
 
-Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA")
+Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA" & SERIAL != "DZ883544", SERIAL != "ZV438183")
 
 # * 3.2 T1 ----
 
@@ -180,12 +180,17 @@ D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(c
 
 # * 3.6 T1 & LP_T1-LP_T35 ----
 
-D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3")
-D_LP <- filter(D_LP, TE16 != 2)
+D_LP <- filter(AD_ohne_Dropout, TIME != "T1", TIME != "T2", TIME != "T3") # 5082 Einträge
+D_LP_ohneTE16 <- filter(D_LP, TE16 != 2) # 4349 Einträge
+# rausgefiltert werden 331 x TE16 = 2 + 402 x NA => 733 rausgefilterte Lernplaneinträge 
+
+# 733/5082 = 0.14423 => 14,42% der Lernplanereinträge wurden über das TE16-Item raus gefiltert
 
 D_T1LP <- rbind(D_T1, D_LP)
 
 table(AD_ohne_Dropout$TE16)
+
+table(D_LP$TE16)
 
 # * 3.7 T1 & T3 => D_T1T3
 
