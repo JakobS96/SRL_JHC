@@ -373,6 +373,8 @@ prop.table(table(AD_ohne_Dropout$DD03))
 # Alter aufgeteilt nach Bedingung
 describeBy(AD_ohne_Dropout$DD02_01, AD_ohne_Dropout$Feedback, mat = TRUE) 
 
+describeBy(D_T1$DD02_01, D_T1$Feedback)
+
 # Alter gesamt
 describe(AD_ohne_Dropout$DD02_01) 
 
@@ -504,10 +506,10 @@ describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-goalt1_differences # n.s. p = .07
+goalt1_differences # n.s. p = .081
 
-ci.smd(ncp = -1.835,
-       n.1 = 74, n.2 = 77) # Cohens d = -.30 
+ci.smd(ncp = -1.7564,
+       n.1 = 74, n.2 = 76) # Cohens d = -.29
 
 # Selbstmotivierung
 describeBy(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -515,10 +517,10 @@ describeBy(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 mott1_differences <- t.test(AD_ohne_Dropout$mott1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-mott1_differences # n.s. p = .13
+mott1_differences # n.s. p = .157
 
-ci.smd(ncp = -1.5245,
-       n.1 = 74, n.2 = 78) # Cohens d = -.25 
+ci.smd(ncp = -1.4219,
+       n.1 = 74, n.2 = 77) # Cohens d = -.23 
 
 # Volition 
 describeBy(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -526,10 +528,10 @@ describeBy(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-volt1_differences # n.s. P = .72
+volt1_differences # n.s. P = .667
 
-ci.smd(ncp = -0.36545,
-       n.1 = 74, n.2 = 78) # Cohens d = -.06
+ci.smd(ncp = -0.4313,
+       n.1 = 74, n.2 = 77) # Cohens d = -.07
 
 # Reflexion 
 describeBy(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -537,10 +539,10 @@ describeBy(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-reft1_differences # n.s. P = .58
+reft1_differences # n.s. P = .669
 
-ci.smd(ncp = -0.56251,
-       n.1 = 74, n.2 = 78) # Cohens d = -.09
+ci.smd(ncp = -0.42874,
+       n.1 = 74, n.2 = 77) # Cohens d = -.07
 
 # Zeitplan
 describeBy(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -548,10 +550,10 @@ describeBy(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-plant1_differences # n.s. p = .13
+plant1_differences # n.s. p = .167
 
-ci.smd(ncp = -1.5088,
-       n.1 = 74, n.2 = 78) # Cohens d = -.24
+ci.smd(ncp = -1.388,
+       n.1 = 74, n.2 = 77) # Cohens d = -.23
 
 # Prokrastination
 describeBy(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -559,10 +561,10 @@ describeBy(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-prot1_differences # n.s. p = .99
+prot1_differences # n.s. p = .971
 
-ci.smd(ncp = -0.016574,
-       n.1 = 74, n.2 = 77) # Cohens d = -.003
+ci.smd(ncp = -0.036323,
+       n.1 = 74, n.2 = 76) # Cohens d = -.01
 
 # Selbstwirksamkeit
 describeBy(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -570,10 +572,10 @@ describeBy(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
-set1_differences # n.s. p = .86
+set1_differences # n.s. p = .868
 
-ci.smd(ncp = 0.17729,
-       n.1 = 74, n.2 = 77) # Cohens d = .03
+ci.smd(ncp = 0.16681,
+       n.1 = 74, n.2 = 76) # Cohens d = .03
 
 # vollstaendig ausgefuellte Lernplaner
 
@@ -582,8 +584,8 @@ describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE)
 LP_vollstaendig <- t.test(D_T1$Anzahl_LP_vollstaendig ~ D_T1$Feedback, var.equal = TRUE)
 LP_vollstaendig
 
-ci.smd(ncp =  0.29203,
-       n.1 = 73, n.2 = 77)
+ci.smd(ncp =  0.44031,
+       n.1 = 74, n.2 = 77)
 
 
 # * * 6.2.2 Achtsamkeitsinventar (CHIME) ---- 
