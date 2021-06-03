@@ -157,6 +157,8 @@ Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & Fin
 
 D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
 
+write.csv2(D_T1, file="D_T1test.csv")
+
 # * 3.3 T2 ----
 
 D_T2 <- subset(AD_ohne_Dropout, TIME=="T2")
@@ -1150,8 +1152,13 @@ D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, 
 
 # * 11.1 Zielsetzung (LZ04_01) ----
 
-Zielsetzung.model <- lme(LZ04_01 ~ Feedback + TIME2.0 + gmc_GOALt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+
+Zielsetzung.model <- lme(LZ04_01 ~ Feedback + TIME2.0 + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
+
+# Modellvergleich Zielsetzung
+Zielsetzung.modelInt <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Zielsetzung.modelInt, Zielsetzung.model) # p-Wert zwar signifikant, aber Modell mit Interaktion wird signifikant schlechter (s. logLikelihood Werte)
 
 # Effektstaerke d
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1211,6 +1218,10 @@ PlotGoalDay
 Planung.model <- lme(PL01_01 ~ Feedback + TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
+# Modellvergleich Planung
+Planung.modelInt <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Planung.model, Planung.modelInt)
+
 # Effektstaerke
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1268,6 +1279,11 @@ PlotPlanDay
 
 Motivation.model <- lme(SM02_02 ~ Feedback + TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
+
+# Modellvergleich intrinsische Motivation
+
+Motivation.modelInt <- lme(SM02_02 ~ Feedback*TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Motivation.model, Motivation.modelInt)
 
 # Effektstaerke
 lme.dscore(Motivation.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1328,6 +1344,10 @@ PlotMotDay
 Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
+# Modellvergleich Selbstwirksamkeit
+Selbstwirksamkeit.modelInt <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Selbstwirksamkeit.model, Selbstwirksamkeit.modelInt)
+
 # Effektstaerke
 lme.dscore(Selbstwirksamkeit.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1386,6 +1406,11 @@ PlotSeDay
 
 Zeitplan.model <- lme(TE06_01 ~ Feedback + TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
+
+# Modellvergleich Zeitplan
+
+Zeitplan.modelInt <- lme(TE06_01 ~ Feedback*TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Zeitplan.model, Zeitplan.modelInt)
 
 # Effektstaerke
 lme.dscore(Zeitplan.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1446,6 +1471,11 @@ PlotTimeDay
 Zufriedenheit.model <- lme(TE10_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
+# Modellvergleich Zufriedenheit
+
+Zufriedenheit.modelInt <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Zufriedenheit.model, Zufriedenheit.modelInt)
+
 # Effektstaerke
 lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
 
@@ -1504,6 +1534,11 @@ PlotSatDay
 
 Prokrastination.model <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
+
+# Modellvergleich Prokrastination
+
+Prokrastination.modelInt <- lme(TE07_01 ~ Feedback*TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Prokrastination.model, Prokrastination.modelInt)
 
 # Effektstaerke
 lme.dscore(Prokrastination.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1565,6 +1600,11 @@ describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 Anstrengung.model <- lme(TE08_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
+
+# Modellvergleich Lernaufwand
+
+Anstrengung.modelInt <- lme(TE08_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+anova(Anstrengung.model, Anstrengung.modelInt)
 
 # Effektstaerke
 lme.dscore(Anstrengung.model,data=D_T1LP_gmc2.0,type="nlme")
