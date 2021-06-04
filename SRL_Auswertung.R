@@ -1634,7 +1634,7 @@ PlotEff <- ggplot(SummEff, aes(x=WEEK, y=TE08_01, colour=Feedback, group=Feedbac
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Anstrengung") +
+  ggtitle("Lernaufwand") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1657,7 +1657,7 @@ PlotEffDay <- ggplot(dayEff, aes(x=TIME2.0, y=TE08_01, colour=Feedback, group=Fe
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Anstrengung") +
+  ggtitle("Lernaufwand") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
