@@ -735,7 +735,7 @@ baseline_goal <- lme(GOAL ~ 1, random = ~1|TIME/Feedback, data = aggdata_long_GO
 goal <- lme(GOAL~TIME*Feedback, random=~TIME|SERIAL, data=aggdata_long_GOAL, method = "ML")
 
 anova(baseline_goal)
-anova(goal) # Feedback signifikant (p < .001, d = .30)
+anova(goal) # Feedback signifikant (p < .007, d = .29)
 anova(baseline_goal, goal)
 
 lme.dscore(goal,data=aggdata_long_GOAL,type="nlme")
@@ -1440,7 +1440,7 @@ PlotTime <- ggplot(SummTime, aes(x=WEEK, y=TE06_01, colour=Feedback, group=Feedb
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Zeitplanung") +
+  ggtitle("Einhaltung des Zeitplans") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1464,7 +1464,7 @@ PlotTimeDay <- ggplot(dayTime, aes(x=TIME2.0, y=TE06_01, colour=Feedback, group=
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Zeitplanung") +
+  ggtitle("Einhaltung des Zeitplans") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1504,7 +1504,7 @@ PlotSat <- ggplot(SummSat, aes(x=WEEK, y=TE10_01, colour=Feedback, group=Feedbac
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Zufriedenheit") +
+  ggtitle("Zufriedenheit mit dem Lerntag") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1528,7 +1528,7 @@ PlotSatDay <- ggplot(daySat, aes(x=TIME2.0, y=TE10_01, colour=Feedback, group=Fe
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Zufriedenheit") +
+  ggtitle("Zufriedenheit mit dem Lerntag") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
