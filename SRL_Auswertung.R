@@ -505,6 +505,8 @@ AD_ohne_Dropout$Feedback.Faktor <- factor(AD_ohne_Dropout$Feedback) # Feedback-V
 # Zielsetzung 
 describeBy(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$goalt2, AD_ohne_Dropout$Feedback, mat = TRUE)
+
 leveneTest(AD_ohne_Dropout$goalt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 goalt1_differences <- t.test(AD_ohne_Dropout$goalt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
@@ -515,6 +517,8 @@ ci.smd(ncp = -1.7564,
 
 # Selbstmotivierung
 describeBy(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+describeBy(AD_ohne_Dropout$mott2, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 leveneTest(AD_ohne_Dropout$mott1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
@@ -527,6 +531,8 @@ ci.smd(ncp = -1.4219,
 # Volition 
 describeBy(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$volt2, AD_ohne_Dropout$Feedback, mat = TRUE)
+
 leveneTest(AD_ohne_Dropout$volt1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 volt1_differences <- t.test(AD_ohne_Dropout$volt1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
@@ -538,6 +544,7 @@ ci.smd(ncp = -0.4313,
 # Reflexion 
 describeBy(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$reft2, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$reft1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 reft1_differences <- t.test(AD_ohne_Dropout$reft1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
@@ -549,6 +556,7 @@ ci.smd(ncp = -0.42874,
 # Zeitplan
 describeBy(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$plant2, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$plant1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 plant1_differences <- t.test(AD_ohne_Dropout$plant1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
@@ -560,6 +568,7 @@ ci.smd(ncp = -1.388,
 # Prokrastination
 describeBy(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$prot2, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$prot1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 prot1_differences <- t.test(AD_ohne_Dropout$prot1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
@@ -571,6 +580,7 @@ ci.smd(ncp = -0.036323,
 # Selbstwirksamkeit
 describeBy(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback, mat = TRUE)
 
+describeBy(AD_ohne_Dropout$set2, AD_ohne_Dropout$Feedback, mat = TRUE)
 leveneTest(AD_ohne_Dropout$set1, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
 
 set1_differences <- t.test(AD_ohne_Dropout$set1 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
