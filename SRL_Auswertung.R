@@ -1170,7 +1170,7 @@ D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, 
 # * 11.1 Zielsetzung (LZ04_01) ----
 
 
-Zielsetzung.model <- lme(LZ04_01 ~ Feedback + TIME2.0 + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zielsetzung.model <- lme(LZ04_01 ~ Feedback + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
 
 # Modellvergleich Zielsetzung
@@ -1232,7 +1232,7 @@ PlotGoalDay
 
 # * 11.2 Planung (PL01_01) ----
 
-Planung.model <- lme(PL01_01 ~ Feedback + TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
 # Modellvergleich Planung
@@ -1294,7 +1294,7 @@ PlotPlanDay
 
 # * 11.3 intrinsische Motivation (SM02_02) ----
 
-Motivation.model <- lme(SM02_02 ~ Feedback + TIME2.0 + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
 
 # Modellvergleich intrinsische Motivation
@@ -1358,7 +1358,7 @@ PlotMotDay
 
 # * 11.4 Selbstwirksamkeit (SE01_03) ----
 
-Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
 # Modellvergleich Selbstwirksamkeit
@@ -1421,7 +1421,7 @@ PlotSeDay
 
 # * 11.5 Zeitplan (TE06_01) ----
 
-Zeitplan.model <- lme(TE06_01 ~ Feedback + TIME2.0 + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
 
 # Modellvergleich Zeitplan
@@ -1485,7 +1485,7 @@ PlotTimeDay
 
 # * 11.6 Zufriedenheit (TE10_01) ----
 
-Zufriedenheit.model <- lme(TE10_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
 # Modellvergleich Zufriedenheit
@@ -1549,7 +1549,7 @@ PlotSatDay
 
 # * 11.7 Prokrastination (TE07_01) ----
 
-Prokrastination.model <- lme(TE07_01 ~ Feedback + TIME2.0 + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
 
 # Modellvergleich Prokrastination
@@ -1615,7 +1615,7 @@ PlotProDay
 
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-Anstrengung.model <- lme(TE08_01 ~ Feedback + TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
 # Modellvergleich Lernaufwand
