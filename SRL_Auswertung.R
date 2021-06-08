@@ -212,67 +212,67 @@ D_T1LP_gmc2.0 <- left_join(D_T1LP_gmc2.0, gmc_Variablen, by = "SERIAL")
 
 # * 4.1 Reliabilitaeten: T1 ----
 
-# Zielsetzung: alpha = .68; omega = .76 
+# Zielsetzung: omega = .76 
 omegagoalt1 <- AD_ohne_Dropout[c("T102_01", "T102_02", "T102_03", "T102_04")]
 omega(omegagoalt1) 
 
-# Selbstmotivierung: alpha = .79; omega = .82 
+# Selbstmotivierung: omega = .81 
 omegamott1 <- AD_ohne_Dropout[c("T103_01", "T103_02", "T103_03")]
 omega(omegamott1) 
 
-# Volition: alpha = .76; omega = .78 
+# Volition: omega = .78 
 omegavolt1 <- AD_ohne_Dropout[c("T104_01", "T104_02", "T104_03","T104_04")]
 omega(omegavolt1) 
 
-# Reflexion: alpha = .71; omega = .74
+# Reflexion: omega = .74
 omegareft1 <- AD_ohne_Dropout[c("T105_01", "T105_02", "T105_03")]
 omega(omegareft1) 
 
-# Zeitplan: alpha = .86; omega = .88
-omegaplant1 <- AD_ohne_Dropout[c("T106_01", "T106_02", "T106_03")]
-omega(omegaplant1)
+# Zeitmanagement: alpha = .86; omega = .87
+omegaZplant1 <- AD_ohne_Dropout[c("T106_01", "T106_02", "T106_03")]
+omega(omegaZplant1)
 
-# Prokrastination: alpha = .95; omega = .96 
+# Prokrastination: omega = .97 
 omegaprot1 <- AD_ohne_Dropout[c("T107_01", "T107_02", "T107_03","T107_04","T107_05","T107_06","T107_07")]
 omega(omegaprot1) 
 
-# Selbstwirksamkeit: alpha = .86; omega = .89 
+# Selbstwirksamkeit: omega = .89 
 omegaset1 <- AD_ohne_Dropout[c("T108_01", "T108_02", "T108_03","T108_04","T108_05","T108_06","T108_07","T108_08","T108_09")]
 omega(omegaset1)
 
-# Chime (T1_1) Gewahrsein gegenueber inneren Erfahrungen: alpha = .70; omega = .75
+# Chime (T1_1) Gewahrsein gegenueber inneren Erfahrungen: omega = .74
 omegaChimeT1_1 <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
 omega(omegaChimeT1_1)
 
-# Chime (T1_2) Gewahrsein gegenueber aeu?eren Erfahrungen: alpha = .77; omega = .81
+# Chime (T1_2) Gewahrsein gegenueber aeusseren Erfahrungen: omega = .81
 omegaChimeT1_2 <- D_T1[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
 omega(omegaChimeT1_2)
 
-# Chime (T1_3) bewusstes Handeln, Gegenwaertigkeit: alpha = .60; omega = .67
+# Chime (T1_3) bewusstes Handeln, Gegenwaertigkeit: omega = .67
 omegaChimeT1_3 <- D_T1[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
 omega(omegaChimeT1_3)
 
-# Chime (T1_4) annehmende, nicht-urteilende, mitfuehlende Haltung: alpha = .88; omega = .90
+# Chime (T1_4) annehmende, nicht-urteilende, mitfuehlende Haltung: omega = .90
 omegaChimeT1_4 <- D_T1[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
 omega(omegaChimeT1_4)
 
-# Chime (T1_5) nicht-reaktive, dezentrierte Orientierung: alpha = .82; omega = .88
+# Chime (T1_5) nicht-reaktive, dezentrierte Orientierung: omega = .88
 omegaChimeT1_5 <- D_T1[c("FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28")]
 omega(omegaChimeT1_5)
 
-# Chime (T1_6) offene, nichtvermeidende Haltung: alpha = .53; omega = .56
+# Chime (T1_6) offene, nichtvermeidende Haltung: omega = .56
 omegaChimeT1_6 <- D_T1[c("FA02_19", "FA02_22", "FA02_30", "FA02_33")]
 omega(omegaChimeT1_6)
 
-# Chime (T1_7) Relativierung: alpha = .51; omega = .60
+# Chime (T1_7) Relativierung: omega = .60
 omegaChimeT1_7 <- D_T1[c("FA02_04", "FA02_23", "FA02_31", "FA02_35")]
 omega(omegaChimeT1_7)
 
-# Chime (T1_8) einsichtsvolles Verstehen: alpha = .73; omega = .80
+# Chime (T1_8) einsichtsvolles Verstehen: omega = .79
 omegaChimeT1_8 <- D_T1[c("FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT1_8)
 
-# Chime (T1_Gesamt): alpha = .89; omega = .91
+# Chime (T1_Gesamt): omega = .91
 omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34", 
                            "FA02_09", "FA02_18", "FA02_21", "FA02_27",
                            "FA02_10", "FA02_12", "FA02_17", "FA02_26",
@@ -283,45 +283,77 @@ omegaChimeT1_Gesamt <- D_T1[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
                            "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT1_Gesamt)
 
+# Belastung im Studium: omega = .83
+omegaBelT1 <- D_T1[c("AV02_01", "AV02_02", "AV02_03", "AV02_04")]
+omega(omegaBelT1)
+
+# allgemeine Zufriedenheit im Studium: omega = .90
+omegaZufT1 <- D_T1[c("AV03_01", "AV03_02", "AV03_03", "AV03_04", "AV03_05")]
+omega(omegaZufT1)
+
+# Anforderungen im Studium: omega = .65
+omegaAnfT1 <- D_T1[c("AV04_01", "AV04_02", "AV04_03")]
+omega(omegaAnfT1)
+
+# Planungsverhalten: omega = .77
+omegaPlanT1 <- D_T1[c("AV05_01", "AV05_02", "AV05_03", "AV05_04")]
+omega(omegaPlanT1)
+
+# Elaboration: omega = .78
+omegaElabT1 <- D_T1[c("AV06_01", "AV06_02", "AV06_03")]
+omega(omegaElabT1)
+
+# Metakognition: omega = .68
+omegaMetaT1 <- D_T1[c("AV07_01", "AV07_02", "AV07_03", "AV07_04")]
+omega(omegaMetaT1)
+
+# Lernumgebung: omega = .72
+omegaLernT1 <- D_T1[c("AV09_01", "AV09_02", "AV09_03")]
+omega(omegaLernT1)
+
+# Regulation: omega = .56
+omegaRegT1 <- D_T1[c("AV10_01", "AV10_02", "AV10_03")]
+omega(omegaRegT1)
+
 # * 4.2 Reliabilitaetsanalyse: T2 ----
 
-# Zielsetzung: alpha = .68; omega = .75
+# Zielsetzung: omega = .75
 omegagoalt2 <- AD_ohne_Dropout[c("T202_01", "T202_02", "T202_03", "T202_04")]
 omega(omegagoalt2) 
 
-# Selbstmotivierung: alpha = .83; omega = .84 
+# Selbstmotivierung: omega = .84 
 omegamott2 <- AD_ohne_Dropout[c("T203_01", "T203_02", "T203_03")]
 omega(omegamott2)
 
-# Volition: alpha = .85; omega = .87
+# Volition: omega = .87
 omegavolt2 <- AD_ohne_Dropout[c("T204_01", "T204_02", "T204_03","T204_04")]
 omega(omegavolt2) 
 
-# Reflexion: alpha = .77; omega = .79
+# Reflexion: omega = .79
 omegareft2 <- AD_ohne_Dropout[c("T205_01", "T205_02", "T205_03")]
 omega(omegareft2) 
 
-# Zeitplan: alpha = .85; omega = .85
-omegaplant2 <- AD_ohne_Dropout[c("T206_01", "T206_02", "T206_03")]
-omega(omegaplant2) 
+# Zeitmanagement: omega = .85
+omegaZplant2 <- AD_ohne_Dropout[c("T206_01", "T206_02", "T206_03")]
+omega(omegaZplant2) 
 
-# Prokrastination: alpha = .92; omega = .94 
+# Prokrastination: omega = .95 
 omegaprot2 <- AD_ohne_Dropout[c("T207_01", "T207_02", "T207_03","T207_04","T207_05","T207_06","T207_07")]
 omega(omegaprot2) 
 
-# Selbstwirksamkeit: alpha = .88; omega = .91 
+# Selbstwirksamkeit: omega = .92 
 omegaset2 <- AD_ohne_Dropout[c("T208_01", "T208_02", "T208_03","T208_04","T208_05","T208_06","T208_07","T208_08","T208_09")]
 omega(omegaset2)
 
-# Chime (T2_1) Gewahrsein gegenueber inneren Erfahrungen: alpha = .75; omega = .81
+# Chime (T2_1) Gewahrsein gegenueber inneren Erfahrungen: omega = .81
 omegaChimeT2_1 <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34")]
 omega(omegaChimeT2_1)
 
-# Chime (T2_2) Gewahrsein gegenueber aeusseren Erfahrungen: alpha = .81; omega = .82
+# Chime (T2_2) Gewahrsein gegenueber aeusseren Erfahrungen: omega = .82
 omegaChimeT2_2 <- D_T2[c("FA02_09", "FA02_18", "FA02_21", "FA02_27")]
 omega(omegaChimeT2_2)
 
-# Chime (T2_3) bewusstes Handeln, Gegenwaertigkeit: alpha = .61; omega = .65
+# Chime (T2_3) bewusstes Handeln, Gegenwaertigkeit: omega = .66
 omegaChimeT2_3 <- D_T2[c("FA02_10", "FA02_12", "FA02_17", "FA02_26")]
 omega(omegaChimeT2_3)
 
@@ -329,23 +361,23 @@ omega(omegaChimeT2_3)
 omegaChimeT2_4 <- D_T2[c("FA02_02", "FA02_07", "FA02_11", "FA02_32", "FA02_36")]
 omega(omegaChimeT2_4)
 
-# Chime (T2_5) nicht-reaktive, dezentrierte Orientierung: alpha = .82; omega = .86
+# Chime (T2_5) nicht-reaktive, dezentrierte Orientierung: omega = .91
 omegaChimeT2_5 <- D_T2[c("FA02_08", "FA02_13", "FA02_16", "FA02_20", "FA02_25", "FA02_28")]
 omega(omegaChimeT2_5)
 
-# Chime (T2_6) offene, nichtvermeidende Haltung: alpha = .71; omega = .71
+# Chime (T2_6) offene, nichtvermeidende Haltung: omega = .74
 omegaChimeT2_6 <- D_T2[c("FA02_19", "FA02_22", "FA02_30", "FA02_33")]
 omega(omegaChimeT2_6)
 
-# Chime (T2_7) Relativierung: alpha = .72; omega = .77
+# Chime (T2_7) Relativierung: omega = .77
 omegaChimeT2_7 <- D_T2[c("FA02_04", "FA02_23", "FA02_31", "FA02_35")]
 omega(omegaChimeT2_7)
 
-# Chime (T2_8) einsichtsvolles Verstehen: alpha = .73; omega = .81
+# Chime (T2_8) einsichtsvolles Verstehen: omega = .81
 omegaChimeT2_8 <- D_T2[c("FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT2_8)
 
-# Chime (T2_Gesamt): alpha = .87; omega = .90
+# Chime (T2_Gesamt): omega = .90
 omegaChimeT2_Gesamt <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_34", 
                               "FA02_09", "FA02_18", "FA02_21", "FA02_27",
                               "FA02_10", "FA02_12", "FA02_17", "FA02_26",
@@ -355,6 +387,27 @@ omegaChimeT2_Gesamt <- D_T2[c("FA02_01", "FA02_05", "FA02_14", "FA02_29", "FA02_
                               "FA02_04", "FA02_23", "FA02_31", "FA02_35",
                               "FA02_03", "FA02_06", "FA02_15", "FA02_24", "FA02_37")]
 omega(omegaChimeT2_Gesamt)
+
+
+# Planungsverhalten: omega = .76
+omegaPlanT2 <- D_T2[c("AV05_01", "AV05_02", "AV05_03", "AV05_04")]
+omega(omegaPlanT2)
+
+# Elaboration: omega = .78
+omegaElabT2 <- D_T2[c("AV06_01", "AV06_02", "AV06_03")]
+omega(omegaElabT2)
+
+# Metakognition: omega = .70
+omegaMetaT2 <- D_T2[c("AV07_01", "AV07_02", "AV07_03", "AV07_04")]
+omega(omegaMetaT2)
+
+# Lernumgebung: omega = .79
+omegaLernT2 <- D_T2[c("AV09_01", "AV09_02", "AV09_03")]
+omega(omegaLernT2)
+
+# Regulation: omega = .65 
+omegaRegT2 <- D_T2[c("AV10_01", "AV10_02", "AV10_03")]
+omega(omegaRegT2)
 
 
 # 5 Deskriptive Analysen ----
