@@ -409,6 +409,15 @@ omega(omegaLernT2)
 omegaRegT2 <- D_T2[c("AV10_01", "AV10_02", "AV10_03")]
 omega(omegaRegT2)
 
+# Evaluation Feedback: omega = .90 
+omegaEvaFbT2 <- D_T2[c("EV04_01", "EV04_02", "EV04_03", "EV04_04", "EV04_05")]
+omega(omegaEvaFbT2)
+
+# Evaluation Lernplaner: omega: .93 
+omegaEvaLpT2 <- D_T2[c("EV02_01", "EV02_02", "EV02_03", "EV02_04", "EV02_05", "EV02_06")]
+omega(omegaEvaLpT2)
+
+# Evaluation Lernplaner
 
 # 5 Deskriptive Analysen ----
 
