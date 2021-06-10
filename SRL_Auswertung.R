@@ -193,7 +193,7 @@ D_LP_ohneTE16 <- filter(D_LP, TE16 != 2) # 4349 Einträge
 
 # 733/5082 = 0.14423 => 14,42% der Lernplanereinträge wurden über das TE16-Item raus gefiltert
 
-D_T1LP <- rbind(D_T1, D_LP)
+D_T1LP <- rbind(D_T1, D_LP_ohneTE16)
 
 table(AD_ohne_Dropout$TE16)
 
@@ -205,6 +205,18 @@ D_T1T3 <- rbind(D_T1, D_T3)
 
 
 # * 3.8 D_T1LP_gmc2.0 ----
+D_T1LPgmc <- D_T1LP %>%
+  mutate(
+    gmc_LZ04_01 = LZ04_01- mean(LZ04_01, na.rm =TRUE),
+    gmc_GOALt1 =goalt1- mean(goalt1, na.rm=TRUE),
+    gmc_MOTt1 = mott1-mean(mott1, na.rm=TRUE),
+    gmc_VOLt1 = volt1-mean(volt1, na.rm=TRUE),
+    gmc_PLANt1 = plant1-mean(plant1, na.rm=TRUE),
+    gmc_PROt1 = prot1-mean(prot1, na.rm=TRUE),
+    gmc_SEt1 = set1-mean(set1, na.rm=TRUE)
+  )
+
+
 # fuer die Mehrebenenanalyse
 
 D_T1LP_gmc2.0 <- subset(D_T1LPgmc, select = c(SERIAL, TIME2.0, WEEK, Feedback, LZ04_01, PL01_01, SM02_02, SE01_03 ,TE06_01, TE10_01 ,TE07_01, TE08_01))
