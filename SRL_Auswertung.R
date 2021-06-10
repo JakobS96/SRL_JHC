@@ -15,6 +15,7 @@ library(lme4)
 library(lavaan)
 library(MBESS)
 library(misty)
+library(multilevel)
 library(nlme)
 library(nortest)
 library(psych)
@@ -25,6 +26,10 @@ library(semTools)
 library(tidyr)
 library(texreg)
 
+
+RStudio.Version()
+
+citation(package = "psych")
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -1210,10 +1215,11 @@ ICCpro <- ICCbare(SERIAL, TE07_01, AD_ohne_Dropout)
 ICCpro
 
 # Brauchen wir die ICC nicht für den Datensatzt D_T1LP_gmc2.0, mit dem wir auch die Mehrebnenenanalyse gerehcnet haben?
-# und warum für die einzelnen Personen und nicht nur für die Gruppenzugehörigkeit?
 
-ICCgoal_Test <- ICCbare(SERIAL, LZ04_01, D_T1LP_gmc2.0)
-ICCgoal_Test
+ICCgoal_Test <- aov(LZ04_01 ~ SERIAL, data = AD_ohne_Dropout)
+summary(ICCgoal_Test)
+ICC1(ICCgoal_Test) # 30.74% der Varianz wird durch die Gruppenzugehörigkeit erklärt.
+ICC2(ICCgoal_Test)
 
 
 # 11 Finale Loesung HLM: ----
@@ -1951,8 +1957,6 @@ ci.smd(ncp = -0.85512,
 
 ## vmtl. müsste man auch irgendwie noch ablgleichen, ob die Leute bei T1 & T3 auch die gleichen Prüfungen 1, 2 & 3 angegeben haben?!
 ## Sonst berechnet man ja Differenzwerte, die gar nicht zusammengehören, weil es sich um unterschiedliche Prüfungen handelt?!
-
-
 
 
 
