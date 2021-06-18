@@ -29,7 +29,7 @@ library(texreg)
 
 RStudio.Version()
 
-citation(package = "psych")
+citation(package = "lme4")
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -42,6 +42,8 @@ Achtsamkeit_Verweildauer <- read.csv2(file.choose()) # Datei: Daten_Achtsamkeit_
 gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
 
 D_T1T3_final <- read.csv2(file.choose()) # Datei: D_T1T3_final
+
+D_T1T2_CHIME_gesamt <- read.csv2(file.choose()) # Datei: D_T1T2_CHIME_gesamt
 
 # * * 1.2.1 Kodierung fehlender Werte ----
 
@@ -184,6 +186,8 @@ table(AD_ohne_Dropout$TIME, AD_ohne_Dropout$Feedback)
 
 D_T1T2_CHIME <- D_T1T2 
 D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(chime1 != "NA", chimeGesamt != "NA")
+
+D_T1T2_CHIME <- left_join(D_T1T2_CHIME, D_T1T2_CHIME_gesamt, by = "SERIAL")
 
 # * 3.6 T1 & LP_T1-LP_T35 ----
 
@@ -473,6 +477,13 @@ table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback)
 
 # vollstaendig ausgefuellte Lernplaner gesamt
 describe(D_T1$Anzahl_LP_vollstaendig) 
+
+D_T1$Fehlende_Eintraege <- 35 - D_T1$Anzahl_LP_vollstaendig
+
+describe(D_T1$Fehlende_Eintraege)
+
+table(D_T1$Fehlende_Eintraege)
+prop.table(table(D_T1$Fehlende_Eintraege))
 
 # Lernplaner nur abends aufgeteilt nach Bedingung
 describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) 
@@ -1160,7 +1171,24 @@ anova(baseline_chimeGesamt, CHIMEgesamt)
 lme.dscore(CHIMEgesamt,data=D_T1T2_CHIME,type="nlme")
 
 
-# 8 Korrelation state und trait Variablen ----
+# 8 Korrelationen ----
+
+# * 8.1 Korrelation CHIME mit Vorwissen fuer Gruppe LPA ----
+
+D_T1T2_CHIME$Diff_CHIME_gesamt <- D_T1T2_CHIME$chimeGesamtT2 - D_T1T2_CHIME$chimeGesamtT1
+
+
+D_T1T2_CHIME_LPA <- filter(D_T1T2_CHIME, Feedback == 0)
+
+
+cor.test(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt)
+
+plot(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt, main="Scatterplot CHIME & Vorwissen",
+     xlab="Vorwissen Achtsamkeit", ylab="Diff_CHIME T2-T1", pch=19)
+abline(lm(Diff_CHIME_gesamt ~ DD10_01, data = D_T1T2_CHIME_LPA), col = "blue")
+
+
+# * 8.2 Korrelation state und trait Variablen ----
 
 aggdata_cor <-aggregate(D_T1LP, by =list(D_T1LP$SERIAL),
                     FUN=mean, na.rm=TRUE)
@@ -1232,7 +1260,6 @@ ICCgoal_Test <- aov(LZ04_01 ~ SERIAL, data = AD_ohne_Dropout)
 summary(ICCgoal_Test)
 ICC1(ICCgoal_Test) # 30.74% der Varianz wird durch die Gruppenzugehörigkeit erklärt.
 ICC2(ICCgoal_Test)
-
 
 # 11 Finale Loesung HLM: ----
 
@@ -1312,7 +1339,7 @@ PlotGoalDay
 
 # * 11.2 Planung (PL01_01) ----
 
-Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
 
 # Modellvergleich Planung
@@ -1321,6 +1348,7 @@ anova(Planung.model, Planung.modelInt)
 
 # Effektstaerke
 lme.dscore(Planung.model,data=D_T1LP_gmc2.0,type="nlme")
+
 
 
 # * * 11.2.1 Plot Wochenverlauf_Planung ----
@@ -1374,7 +1402,7 @@ PlotPlanDay
 
 # * 11.3 intrinsische Motivation (SM02_02) ----
 
-Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
 
 # Modellvergleich intrinsische Motivation
@@ -1403,7 +1431,7 @@ PlotMot <- ggplot(SummMot, aes(x=WEEK, y=SM02_02, colour=Feedback, group=Feedbac
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Motivation") +
+  ggtitle("(intrinsische) Motivation") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1427,7 +1455,7 @@ PlotMotDay <- ggplot(dayMot, aes(x=TIME2.0, y=SM02_02, colour=Feedback, group=Fe
                    breaks=c("0", "1"),
                    labels=c("Achtsamkeit", "Feedback"),
                    l=40) +                    
-  ggtitle("Motivation") +
+  ggtitle("(intrinsische) Motivation") +
   expand_limits(y=2:6) +                        
   scale_y_continuous(breaks=2:6) +        
   theme_bw() +
@@ -1438,7 +1466,7 @@ PlotMotDay
 
 # * 11.4 Selbstwirksamkeit (SE01_03) ----
 
-Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
 # Modellvergleich Selbstwirksamkeit
@@ -1501,7 +1529,7 @@ PlotSeDay
 
 # * 11.5 Zeitplan (TE06_01) ----
 
-Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + Feedback + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
 
 # Modellvergleich Zeitplan
@@ -1565,7 +1593,7 @@ PlotTimeDay
 
 # * 11.6 Zufriedenheit (TE10_01) ----
 
-Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
 # Modellvergleich Zufriedenheit
@@ -1629,7 +1657,7 @@ PlotSatDay
 
 # * 11.7 Prokrastination (TE07_01) ----
 
-Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
 
 # Modellvergleich Prokrastination
@@ -1695,7 +1723,7 @@ PlotProDay
 
 describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
+Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
 
 # Modellvergleich Lernaufwand
@@ -1960,7 +1988,6 @@ tatsN_gesamt_differences # n.s. p = .394
 
 ci.smd(ncp = -0.85512,
        n.1 = 45, n.2 = 68) # Cohens d = -.16 
-
 
 
 ## Problem: Berechnung der neuen Variablen für die DIfferenz zwischen erwarteter und tatsächlich Note klappt nicht
