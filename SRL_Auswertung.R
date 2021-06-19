@@ -140,16 +140,16 @@ AD$chimeGesamt <- (AD$chime1 + AD$chime2 + AD$chime3 + AD$chime4 + AD$chime5 + A
 
 # * 2.4 Skalenbildung Evaluation Lernplaner ----
 
-AD$EVLP <- (AD$EV02_01 + AD$EV02_02+ AD$EV02_03 + AD$EV02_04 + AD$EV02_05 + AD$EV02_06)/6
+AD$EV02_01_umkodiert <- 7 - AD$EV02_01 
 
-AD_ohne_Dropout$EVLP <- (AD_ohne_Dropout$EV02_01 + AD_ohne_Dropout$EV02_02+ AD_ohne_Dropout$EV02_03 + AD_ohne_Dropout$EV02_04 + AD_ohne_Dropout$EV02_05 + AD_ohne_Dropout$EV02_06)/6
-
- # relevant ob Dropout oder nicht? Deskriptiv sowieso kaum Unterschiede
+AD$EVLP <- (AD$EV02_01_umkodiert + AD$EV02_02+ AD$EV02_03 + AD$EV02_04 + AD$EV02_05 + AD$EV02_06)/6
 
 
 # * 2.5 Skalenbildung Evaluation Feedback ----
 
-AD_ohne_Dropout$EVFB <- (AD_ohne_Dropout$EV04_01 + AD_ohne_Dropout$EV04_02 + AD_ohne_Dropout$EV04_03 + AD_ohne_Dropout$EV04_04 + AD_ohne_Dropout$EV04_05)/5
+AD$EV04_04_umkodiert <- 7 - AD$EV04_04 
+
+AD$EVFB <- (AD$EV04_01 + AD$EV04_02 + AD$EV04_03 + AD$EV04_04_umkodiert + AD$EV04_05)/5
 
 
 # 3 Bildung der benoetigten Subsets ----
@@ -499,7 +499,7 @@ describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 # * 5.6 Evaluation Feedback ----
 
-describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.15, SD = 1.08
+describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.58, SD = 1.11
 
 
 # 6 T-Tests (Gruppenvergleiche) ----
@@ -801,8 +801,8 @@ leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Vari
 EVLP_differences <- t.test(AD_ohne_Dropout$EVLP ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA 
 
-ci.smd(ncp = -3.5777,
-       n.1 = 79, n.2 = 74) # d = -.58 # warum minus d?
+ci.smd(ncp = -3.2046,
+       n.1 = 77, n.2 = 74) # d = -.52 # warum minus d?
 
 # * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 ----
 # (Ich wuerde in Zukunft in bestimmten Situationen wieder einen Lernplaner nutzen.)
@@ -814,8 +814,8 @@ leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => V
 EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EV02_05_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 
-ci.smd(ncp = -1.4414,
-       n.1 = 79, n.2 = 74) # Cohens d = -.23
+ci.smd(ncp = -1.706,
+       n.1 = 77, n.2 = 74) # Cohens d = -.28
 
 
 # 7 T1-T2 ANOVAs ----
@@ -1047,9 +1047,9 @@ D_T1T2_CHIME <- D_T1T2_CHIME %>% group_by(SERIAL) %>% filter(n()>1) %>% filter(c
 
 # lme fuer CHIME Subskala 1 
 
-describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime1, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime1 <- lme(chime1 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME1 <- lme(chime1~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime1)
@@ -1061,9 +1061,9 @@ lme.dscore(CHIME1,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 2 
 
-describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime2, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime2 <- lme(chime2 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime2 <- lme(chime2 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME2 <- lme(chime2~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime2)
@@ -1075,9 +1075,9 @@ lme.dscore(CHIME2,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 3 
 
-describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime3, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime3 <- lme(chime3 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime3 <- lme(chime3 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME3 <- lme(chime3~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime3)
@@ -1089,9 +1089,9 @@ lme.dscore(CHIME3,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 4 
 
-describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime4, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime4 <- lme(chime4 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime4 <- lme(chime4 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME4 <- lme(chime4~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime4)
@@ -1103,9 +1103,9 @@ lme.dscore(CHIME4,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 5 
 
-describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime5, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime5 <- lme(chime5 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME5 <- lme(chime5~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime5)
@@ -1117,9 +1117,9 @@ lme.dscore(CHIME5,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 6 
 
-describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime6, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime6 <- lme(chime6 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME6 <- lme(chime6~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime6)
@@ -1131,9 +1131,9 @@ lme.dscore(CHIME6,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 7 
 
-describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime7, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime7 <- lme(chime7 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime7 <- lme(chime7 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME7 <- lme(chime7~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime7)
@@ -1145,9 +1145,9 @@ lme.dscore(CHIME7,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Subskala 8 
 
-describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE) 
+describeBy(D_T1T2_CHIME$chime8, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE) 
 
-baseline_chime8 <- lme(chime8 ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chime8 <- lme(chime8 ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIME8 <- lme(chime8~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chime8)
@@ -1159,9 +1159,9 @@ lme.dscore(CHIME8,data=D_T1T2_CHIME,type="nlme")
 
 # lme fuer CHIME Gesamt 
 
-describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Feedback), mat = TRUE)
+describeBy(D_T1T2_CHIME$chimeGesamt, list(D_T1T2_CHIME$TIME, D_T1T2_CHIME$Achtsamkeit), mat = TRUE)
 
-baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Feedback, data = D_T1T2_CHIME, method = "ML")
+baseline_chimeGesamt <- lme(chimeGesamt ~ 1, random = ~1|TIME/Achtsamkeit, data = D_T1T2_CHIME, method = "ML")
 CHIMEgesamt <- lme(chimeGesamt~TIME*Achtsamkeit, random=~TIME|SERIAL, data=D_T1T2_CHIME, method = "ML")
 
 anova(baseline_chimeGesamt)
@@ -1182,6 +1182,10 @@ D_T1T2_CHIME_LPA <- filter(D_T1T2_CHIME, Feedback == 0)
 
 
 cor.test(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt)
+
+describeBy(D_T1T2_CHIME_LPA$Diff_CHIME_gesamt, D_T1T2_CHIME_LPA$QUESTNNR)
+
+describe(D_T1T2_CHIME_LPA$DD10_01)
 
 plot(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt, main="Scatterplot CHIME & Vorwissen",
      xlab="Vorwissen Achtsamkeit", ylab="Diff_CHIME T2-T1", pch=19)
@@ -1822,7 +1826,7 @@ Achtsamkeit_false_TA01 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 140, QUESTN
 Achtsamkeit_false_TA01$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA01$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA01$SERIAL))
 
 # * 12.2 TA02 - Faust-Ballen-Jakob (ca. 120s) ----
 Achtsamkeit_false_TA02 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 120, QUESTNNR == "TA02")
@@ -1831,7 +1835,7 @@ Achtsamkeit_false_TA02 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 120, QUESTN
 Achtsamkeit_false_TA02$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA02$SERIAL) # insgesamt haben 23 Personen die ?bung einmal ?bersprungen; 7 Personen zweimal
-
+cumsum(table(Achtsamkeit_false_TA02$SERIAL))
 
 # * 12.3 TA03 - Unsere Gedanken (240s) ----
 Achtsamkeit_false_TA03 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA03")
@@ -1840,7 +1844,7 @@ Achtsamkeit_false_TA03 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA03$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA03$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA03$SERIAL))
 
 # * 12.4 TA04 - Erfahrung beobachten (240s) ----
 Achtsamkeit_false_TA04 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA04")
@@ -1849,7 +1853,7 @@ Achtsamkeit_false_TA04 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA04$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA04$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA04$SERIAL))
 
 # * 12.5 TA05 - Seated-Mantra-Jakob (ca. 139s) ----
 Achtsamkeit_false_TA05 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 139, QUESTNNR == "TA05")
@@ -1858,7 +1862,7 @@ Achtsamkeit_false_TA05 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 139, QUESTN
 Achtsamkeit_false_TA05$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA05$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA05$SERIAL))
 
 # * 12.6 TA06 - Seated-Mantra-Thilini (ca. 180s) ----
 Achtsamkeit_false_TA06 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 180, QUESTNNR == "TA06")
@@ -1867,7 +1871,7 @@ Achtsamkeit_false_TA06 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 180, QUESTN
 Achtsamkeit_false_TA06$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA06$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA06$SERIAL))
 
 # * 12.7 TA07 - Bewusstes Atmen (240s) ----
 Achtsamkeit_false_TA07 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA07")
@@ -1876,7 +1880,7 @@ Achtsamkeit_false_TA07 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA07$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA07$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA07$SERIAL))
 
 # * 12.8 TA08 - OMP-Jakob (ca. 575s) ----
 Achtsamkeit_false_TA08 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 575, QUESTNNR == "TA08")
@@ -1885,7 +1889,7 @@ Achtsamkeit_false_TA08 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 575, QUESTN
 Achtsamkeit_false_TA08$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA08$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA08$SERIAL))
 
 # * 12.9 TA09 - OMP-Thilini (ca.440s) ----
 Achtsamkeit_false_TA09 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 440, QUESTNNR == "TA09")
@@ -1894,7 +1898,7 @@ Achtsamkeit_false_TA09 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 440, QUESTN
 Achtsamkeit_false_TA09$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA09$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA09$SERIAL))
 
 # * 12.10 TA10 - Wahrnehmung Atem (240s) ----
 Achtsamkeit_false_TA10 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTNNR == "TA10")
@@ -1903,7 +1907,7 @@ Achtsamkeit_false_TA10 <- filter(Achtsamkeit_ohne_Dropout, TIME013 < 240, QUESTN
 Achtsamkeit_false_TA10$AI12_01 # angefuehrte Gruende, warum Uebung uebersprungen wurde
 
 table(Achtsamkeit_false_TA10$SERIAL) # Haeufigkeiten, wie oft die Uebung von den jeweiligen Personen uebersprungen wurde
-
+cumsum(table(Achtsamkeit_false_TA10$SERIAL))
 
 # 13 Auswertung T3 ----
 
@@ -1942,8 +1946,8 @@ leveneTest(D_T3$ZufN_gesamt, D_T3$Feedback.Faktor) # n.s. => Varianzhomogenitaet
 ZufN_gesamt_differences <- t.test(D_T3$ZufN_gesamt ~ D_T3$Feedback, var.equal = TRUE)
 ZufN_gesamt_differences # n.s. p = .730
 
-ci.smd(ncp = 0.34638,
-       n.1 = 45, n.2 = 69) # Cohens d = .07 
+ci.smd(ncp = 0.18327,
+       n.1 = 45, n.2 = 67) # Cohens d = .07 
 
 # * 13.2 erwartete vs. finale Noten ----
 
