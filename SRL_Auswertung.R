@@ -39,6 +39,8 @@ Zusatzvariablen <- read.csv2(file.choose()) # Datei: Zusatzvariablen_neu
 
 Achtsamkeit_Verweildauer <- read.csv2(file.choose()) # Datei: Daten_Achtsamkeit_Verweildauer
 
+Lernplaner_Feedback <- read.csv2(file.choose()) # Datei: Lernplaner_Feedback
+
 gmc_Variablen <- read.csv2(file.choose()) # Datei: gmc_Variablen
 
 D_T1T3_final <- read.csv2(file.choose()) # Datei: D_T1T3_final
@@ -50,6 +52,8 @@ D_T1T2_CHIME_gesamt <- read.csv2(file.choose()) # Datei: D_T1T2_CHIME_gesamt
 Alle_Daten[Alle_Daten == -9 | Alle_Daten == -1 | Alle_Daten == ""] <- NA
 
 Achtsamkeit_Verweildauer[Achtsamkeit_Verweildauer == -9 | Achtsamkeit_Verweildauer == -1 | Achtsamkeit_Verweildauer == ""] <- NA
+
+Lernplaner_Feedback[Lernplaner_Feedback == -9 | Lernplaner_Feedback == -1 | Lernplaner_Feedback == ""] <- NA
 
 # * * 1.2.2 neue Zusatzvariablen ----
 
@@ -63,6 +67,8 @@ Alle_Daten_neu <- left_join(Alle_Daten, Zusatzvariablen, by = "SERIAL")
 AD <- Alle_Daten_neu
 
 Achtsamkeit_Verweildauer <- left_join(Achtsamkeit_Verweildauer, Zusatzvariablen, by = "SERIAL")
+
+Lernplaner_Feedback <- left_join(Lernplaner_Feedback, Zusatzvariablen, by = "SERIAL")
 
 # * 1.3 Dropout bestimmen ----
   # (Berechnen einer neuen Variable: dropout)
@@ -160,11 +166,11 @@ AD_ohne_Dropout <- filter(AD, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SE
 
 Achtsamkeit_ohne_Dropout <- filter(Achtsamkeit_Verweildauer, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA" & SERIAL != "DZ883544", SERIAL != "ZV438183")
 
+Feedback_ohne_Dropout <- filter(Lernplaner_Feedback, FinishT1 == 1 & FinishT2 == 1 & Finish18 == 1 & SERIAL != "NA" & SERIAL != "DZ883544", SERIAL != "ZV438183")
+
 # * 3.2 T1 ----
 
 D_T1 <- subset(AD_ohne_Dropout, TIME=="T1")
-
-write.csv2(D_T1, file="D_T1test.csv")
 
 # * 3.3 T2 ----
 
@@ -501,6 +507,52 @@ describeBy(AD_ohne_Dropout$DD10_08, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 describeBy(AD_ohne_Dropout$EVFB, AD_ohne_Dropout$Feedback, mat = TRUE) # M = 3.58, SD = 1.11
 
+# Verweildauer Feedback am Abend
+
+describe(Feedback_ohne_Dropout$TIME017)
+
+describeBy(Feedback_ohne_Dropout$TIME017, Feedback_ohne_Dropout$Tage)
+
+
+weekFeedback <- summarySE(Feedback_ohne_Dropout, measurevar="TIME017", groupvars= "Wochen", na.rm = TRUE)
+weekFeedback
+
+pd <- position_dodge(0)
+
+PlotFeedbackWeek <- ggplot(weekFeedback, aes(x=Wochen, y=TIME017)) + 
+  geom_line() +
+  geom_point(size=2, fill="white") + 
+  xlab("Wochen") +
+  ylab("Verweildauer Feedbackseite in s") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(name = "Verweildauer Feedback in s", limits = c(0, 60), breaks = seq(0, 60, 10)) + 
+  scale_x_continuous(name = "Wochen", limits = c(1, 5), breaks = seq(1, 5, 1)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+PlotFeedbackWeek
+
+
+
+dayFeedback <- summarySE(Feedback_ohne_Dropout, measurevar="TIME017", groupvars= "Tage", na.rm = TRUE)
+dayFeedback
+
+pd <- position_dodge(0)
+
+PlotFeedbackDay <- ggplot(dayFeedback, aes(x=Tage, y=TIME017)) + 
+  geom_line() +
+  geom_point(size=2, fill="white") + 
+  xlab("Tage") +
+  ylab("Verweildauer Feedbackseite in s") +
+  expand_limits(y=2:6) +                        
+  scale_y_continuous(name = "Verweildauer Feedback in s", limits = c(0, 150), breaks = seq(0, 150, 20)) + 
+  scale_x_continuous(name = "Tage", limits = c(1, 35), breaks = seq(1, 35, 2)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+PlotFeedbackDay
+
+
 
 # 6 T-Tests (Gruppenvergleiche) ----
 
@@ -794,6 +846,8 @@ ci.smd(ncp = 0.51287,
        n.1 = 73, n.2 = 76) # Cohens d = .08
 
 # * 6.3 Unterschiede Evaluation Lernplaner ----
+describe(AD_ohne_Dropout$EVLP)
+
 describeBy(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Varianzhomogenitaet gegeben
@@ -801,7 +855,7 @@ leveneTest(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback.Faktor) # n.s. => Vari
 EVLP_differences <- t.test(AD_ohne_Dropout$EVLP ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EVLP_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA 
 
-ci.smd(ncp = -3.2046,
+ci.smd(ncp = 3.2046,
        n.1 = 77, n.2 = 74) # d = -.52 # warum minus d?
 
 # * * 6.3.1 Unterschiede Evaluation Lernplaneritem EV02_05 ----
@@ -814,7 +868,7 @@ leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => V
 EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EV02_05_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 
-ci.smd(ncp = -1.706,
+ci.smd(ncp = 1.706,
        n.1 = 77, n.2 = 74) # Cohens d = -.28
 
 
@@ -1187,7 +1241,7 @@ describeBy(D_T1T2_CHIME_LPA$Diff_CHIME_gesamt, D_T1T2_CHIME_LPA$QUESTNNR)
 
 describe(D_T1T2_CHIME_LPA$DD10_01)
 
-plot(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt, main="Scatterplot CHIME & Vorwissen",
+plot(D_T1T2_CHIME_LPA$DD10_01, D_T1T2_CHIME_LPA$Diff_CHIME_gesamt,
      xlab="Vorwissen Achtsamkeit", ylab="Diff_CHIME T2-T1", pch=19)
 abline(lm(Diff_CHIME_gesamt ~ DD10_01, data = D_T1T2_CHIME_LPA), col = "blue")
 
