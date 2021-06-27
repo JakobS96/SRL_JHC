@@ -552,6 +552,13 @@ PlotFeedbackDay <- ggplot(dayFeedback, aes(x=Tage, y=TIME017)) +
 
 PlotFeedbackDay
 
+# * 5.7 Evaluation Lernplaner (tägliche Abfrage) ----
+
+# Der Lernplaner hat mir geholfen, meinen Tag zu strukturieren (= Wie hilfreich war der Lernplaner heute?)
+describeBy(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+# Das Ausfüllen des Lernplaners hat heute Spaß gemacht 
+describeBy(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 
 # 6 T-Tests (Gruppenvergleiche) ----
@@ -845,7 +852,7 @@ chimeGesamt_differences # n.s. p = 0.61
 ci.smd(ncp = 0.51287,
        n.1 = 73, n.2 = 76) # Cohens d = .08
 
-# * 6.3 Unterschiede Evaluation Lernplaner ----
+# * 6.3 Unterschiede Evaluation Lernplaner (Fragebögen) ----
 describe(AD_ohne_Dropout$EVLP)
 
 describeBy(AD_ohne_Dropout$EVLP, AD_ohne_Dropout$Feedback, mat = TRUE)
@@ -868,9 +875,32 @@ leveneTest(AD_ohne_Dropout$EV02_05, AD_ohne_Dropout$Feedback.Faktor) # n.s. => V
 EV02_05_differences <- t.test(AD_ohne_Dropout$EV02_05 ~ AD_ohne_Dropout$Feedback, var.equal = TRUE)
 EV02_05_differences # signfikant p < .001 --> LPF bewertet LP besser als LPA
 
-ci.smd(ncp = 1.706,
+ci.smd(ncp = -1.706,
        n.1 = 77, n.2 = 74) # Cohens d = -.28
 
+# * 6.4 Unterschiede Evaluation Lernplaner (Lernplaner - tägliche Messung) ----
+
+# Hilreich (TE14_01)
+describeBy(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
+
+TE14_01_drop <- t.test(AD_ohne_Dropout$TE14_01 ~ AD_ohne_Dropout$Feedback)
+TE14_01_drop # signifikant p < .001 --> LPF findet LP (täglich) hilfreicher als LPA
+
+ci.smd(ncp = 22.216,
+       n.1 = 2302, n.2 = 2339) # Cohens d = .65
+
+# Spaß (TE15_01)
+describeBy(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback, mat = TRUE)
+
+leveneTest(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
+
+TE15_01_drop <- t.test(AD_ohne_Dropout$TE15_01 ~ AD_ohne_Dropout$Feedback)
+TE15_01_drop # signifikant p < .001 --> LPF hat am LP mehr Spaß (täglich) als LPA
+
+ci.smd(ncp = 16.364,
+       n.1 = 2327, n.2 = 2338) # Cohens d = .48
 
 # 7 T1-T2 ANOVAs ----
 
