@@ -15,6 +15,7 @@ library(lme4)
 library(lavaan)
 library(MBESS)
 library(misty)
+library(MuMIn)
 library(multilevel)
 library(nlme)
 library(nortest)
@@ -29,7 +30,9 @@ library(texreg)
 
 RStudio.Version()
 
-citation(package = "lme4")
+citation(package = "nlme")
+
+citation(package = "ggplot2")
 
 # * 1.2 Laden des Datensatzes und der Datei mit den Zusatzvariablen ----
 
@@ -880,10 +883,10 @@ ci.smd(ncp = -1.706,
 
 # * 6.4 Unterschiede Evaluation Lernplaner (Lernplaner - tägliche Messung) ----
 
-# Hilreich (TE14_01)
+# Hilfreich (TE14_01)
 describeBy(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
+leveneTest(AD_ohne_Dropout$TE14_01, AD_ohne_Dropout$Feedback.Faktor) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
 
 TE14_01_drop <- t.test(AD_ohne_Dropout$TE14_01 ~ AD_ohne_Dropout$Feedback)
 TE14_01_drop # signifikant p < .001 --> LPF findet LP (täglich) hilfreicher als LPA
@@ -894,7 +897,7 @@ ci.smd(ncp = 22.216,
 # Spaß (TE15_01)
 describeBy(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
-leveneTest(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
+leveneTest(AD_ohne_Dropout$TE15_01, AD_ohne_Dropout$Feedback.Faktor) # signifikant => Varianzhomogenitaet NICHT gegeben => Welch-Test
 
 TE15_01_drop <- t.test(AD_ohne_Dropout$TE15_01 ~ AD_ohne_Dropout$Feedback)
 TE15_01_drop # signifikant p < .001 --> LPF hat am LP mehr Spaß (täglich) als LPA
@@ -1368,9 +1371,15 @@ D_T1LP_gmc2.0$Feedback <- factor(D_T1LP_gmc2.0$Feedback) # Feedback als Faktor, 
 Zielsetzung.model <- lme(LZ04_01 ~ Feedback + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zielsetzung.model)
 
+VarCorr(Zielsetzung.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Zielsetzung.model) # marginal nur Fixed Effect, conditional: Varianzanteil, der durch fixed und random erklärt wird
+
+
 # Modellvergleich Zielsetzung
 Zielsetzung.modelInt <- lme(LZ04_01 ~ Feedback*TIME2.0 + gmc_GOALt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 anova(Zielsetzung.modelInt, Zielsetzung.model) # p-Wert zwar signifikant, aber Modell mit Interaktion wird signifikant schlechter (s. logLikelihood Werte)
+
 
 # Effektstaerke d
 lme.dscore(Zielsetzung.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1429,6 +1438,11 @@ PlotGoalDay
 
 Planung.model <- lme(PL01_01 ~ Feedback + gmc_PLANt1, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Planung.model)
+
+VarCorr(Planung.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Planung.model)
+
 
 # Modellvergleich Planung
 Planung.modelInt <- lme(PL01_01 ~ Feedback*TIME2.0 + gmc_PLANt1, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
@@ -1492,6 +1506,11 @@ PlotPlanDay
 
 Motivation.model <- lme(SM02_02 ~ Feedback + gmc_MOTt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Motivation.model)
+
+VarCorr(Motivation.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Motivation.model)
+
 
 # Modellvergleich intrinsische Motivation
 
@@ -1557,6 +1576,10 @@ PlotMotDay
 Selbstwirksamkeit.model <- lme(SE01_03 ~ Feedback + gmc_SEt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Selbstwirksamkeit.model)
 
+VarCorr(Selbstwirksamkeit.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Selbstwirksamkeit.model)
+
 # Modellvergleich Selbstwirksamkeit
 Selbstwirksamkeit.modelInt <- lme(SE01_03 ~ Feedback*TIME2.0 + gmc_SEt1 , random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 anova(Selbstwirksamkeit.model, Selbstwirksamkeit.modelInt)
@@ -1619,6 +1642,10 @@ PlotSeDay
 
 Zeitplan.model <- lme(TE06_01 ~ Feedback + gmc_PLANt1 , random = ~ 1 + TIME2.0 |SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zeitplan.model)
+
+VarCorr(Zeitplan.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Zeitplan.model)
 
 # Modellvergleich Zeitplan
 
@@ -1684,10 +1711,15 @@ PlotTimeDay
 Zufriedenheit.model <- lme(TE10_01 ~ Feedback, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Zufriedenheit.model)
 
+VarCorr(Zufriedenheit.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Zufriedenheit.model)
+
 # Modellvergleich Zufriedenheit
 
 Zufriedenheit.modelInt <- lme(TE10_01 ~ Feedback*TIME2.0, random = ~ 1 + Feedback + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 anova(Zufriedenheit.model, Zufriedenheit.modelInt)
+
 
 # Effektstaerke
 lme.dscore(Zufriedenheit.model,data=D_T1LP_gmc2.0,type="nlme")
@@ -1747,6 +1779,10 @@ PlotSatDay
 
 Prokrastination.model <- lme(TE07_01 ~ Feedback + gmc_PROt1 , random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Prokrastination.model)
+
+VarCorr(Prokrastination.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Prokrastination.model)
 
 # Modellvergleich Prokrastination
 
@@ -1813,6 +1849,10 @@ describeBy(AD_ohne_Dropout$TE08_01, AD_ohne_Dropout$Feedback, mat = TRUE)
 
 Anstrengung.model <- lme(TE08_01 ~ Feedback, random = ~ 1 + TIME2.0|SERIAL, correlation=corAR1(),na.action = na.omit, data = D_T1LP_gmc2.0)
 summary(Anstrengung.model)
+
+VarCorr(Anstrengung.model) # Varianzen und Standardabweichungen der Zufallseffekte
+
+r.squaredGLMM(Anstrengung.model)
 
 # Modellvergleich Lernaufwand
 
