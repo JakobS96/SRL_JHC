@@ -470,7 +470,26 @@ prop.table(table(AD_ohne_Dropout$DD04_01))
 # * 5.4 ausgefuellte Lernplaner ---- 
 
 
-# vollstaendig ausgefuellte Lernplaner
+# vollstaendig ausgefuellte Lernplaner aufgeteilt nach Bedingung
+describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE) 
+table(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback)
+
+# vollstaendig ausgefuellte Lernplaner gesamt
+describe(D_T1$Anzahl_LP_vollstaendig) 
+
+D_T1$Fehlende_Eintraege <- 35 - D_T1$Anzahl_LP_vollstaendig
+
+describe(D_T1$Fehlende_Eintraege)
+
+table(D_T1$Fehlende_Eintraege)
+prop.table(table(D_T1$Fehlende_Eintraege))
+
+# Lernplaner nur abends aufgeteilt nach Bedingung
+describeBy(D_T1$Anzahl_LP_abends, D_T1$Feedback, mat = TRUE) 
+table(D_T1$Anzahl_LP_abends , D_T1$Feedback) 
+
+
+# Im Mittel ausgefuellte Lernplaner nach Bedingung
 
 describeBy(D_T1$Anzahl_LP_vollstaendig, D_T1$Feedback, mat = TRUE)
 
